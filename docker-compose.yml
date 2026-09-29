@@ -1,0 +1,23 @@
+services:
+  workfuel:
+    build: .
+    image: workfuel:latest
+    container_name: workfuel
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - DATA_DIR=/app/data
+    volumes:
+      - workfuel_data:/app/data
+    mem_limit: 160m
+    networks:
+      - proxy
+
+volumes:
+  workfuel_data:
+
+networks:
+  # Shared with the existing Caddy reverse proxy on the server (edu-crm-caddy).
+  proxy:
+    external: true
+    name: edu-crm_edu-crm-network

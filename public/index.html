@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>WorkFuel</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1322;--surface:#121c2e;--surface2:#18243a;--line:#24324b;
+  --text:#e9eef7;--muted:#8d9bb2;--blue:#3b82f6;--blue-soft:rgba(59,130,246,.16);
+  --green:#22c55e;--green-soft:rgba(34,197,94,.14);--orange:#f5a524;--orange-soft:rgba(245,165,36,.15);
+  --red:#ef4444;--red-soft:rgba(239,68,68,.14);--on-accent:#fff;--shadow:0 10px 30px rgba(0,0,0,.35);
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#eef2f8;--surface:#ffffff;--surface2:#f3f6fb;--line:#dbe2ec;
+    --text:#0f1b2d;--muted:#5b6b82;--blue:#2563eb;--blue-soft:rgba(37,99,235,.1);
+    --green:#16a34a;--green-soft:rgba(22,163,74,.1);--orange:#d97706;--orange-soft:rgba(217,119,6,.12);
+    --red:#dc2626;--red-soft:rgba(220,38,38,.1);--shadow:0 8px 24px rgba(15,27,45,.1);color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#eef2f8;--surface:#ffffff;--surface2:#f3f6fb;--line:#dbe2ec;
+  --text:#0f1b2d;--muted:#5b6b82;--blue:#2563eb;--blue-soft:rgba(37,99,235,.1);
+  --green:#16a34a;--green-soft:rgba(22,163,74,.1);--orange:#d97706;--orange-soft:rgba(217,119,6,.12);
+  --red:#dc2626;--red-soft:rgba(220,38,38,.1);--shadow:0 8px 24px rgba(15,27,45,.1);color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Manrope,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;padding-top:env(safe-area-inset-top,0px)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.app{max-width:480px;margin:0 auto;padding:16px 16px 110px}
+body.no-nav .app{padding-bottom:32px}
+body.no-nav nav.tabs{display:none}
+.screen{display:none}
+.screen.active{display:block;animation:in .22s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.screen.active{animation:none}}
+
+/* header */
+.brand{display:flex;align-items:center;gap:12px;margin:4px 0 16px}
+.brand > svg{width:48px;height:32px;flex:none}
+.brand h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-.01em}
+.mpick{border:0;background:transparent;padding:0;text-align:left;min-width:0;flex:1}
+.mpick p{margin:0;color:var(--muted);font-size:13px;display:flex;align-items:center;gap:4px;white-space:nowrap;overflow:hidden}
+.mpick p span{overflow:hidden;text-overflow:ellipsis}
+.mpick p svg{width:14px;height:14px;flex:none}
+.topbar{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;margin:0 0 16px}
+.topbar h2{margin:0;text-align:center;font-size:18px;font-weight:700}
+.icon-btn{width:40px;height:40px;border-radius:12px;border:0;background:transparent;display:grid;place-items:center;color:var(--text);flex:none}
+.icon-btn:hover{background:var(--surface2)}
+.icon-btn svg{width:22px;height:22px}
+body.tg .topbar .icon-btn[data-go]{visibility:hidden}
+
+/* hero */
+.hero{border-radius:20px;overflow:hidden;position:relative;background:var(--surface);box-shadow:var(--shadow)}
+.hero svg{display:block;width:100%;height:auto}
+.hero .hero-title{position:absolute;left:16px;bottom:12px;font-weight:800;font-size:18px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface);border:1px solid var(--line);border-radius:18px;margin-top:-6px;position:relative}
+.stat{padding:14px 8px;text-align:center;min-width:0}
+.stat+.stat{border-left:1px solid var(--line)}
+.stat svg{width:24px;height:24px;margin-bottom:6px}
+.stat small{display:block;color:var(--muted);font-size:11.5px;margin-bottom:4px}
+.stat b{font-size:16px;font-weight:800;white-space:nowrap}
+
+/* buttons */
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border:0;border-radius:14px;padding:15px 16px;font-weight:700;font-size:16px;margin-top:12px}
+.btn svg{width:20px;height:20px;flex:none}
+.btn-primary{background:var(--blue);color:var(--on-accent)}
+.btn-primary:hover{filter:brightness(1.08)}
+.btn-ghost{background:var(--surface2);border:1px solid var(--line)}
+.btn-danger{background:var(--red-soft);color:var(--red)}
+.btn-green{background:var(--green);color:#fff}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-row .btn{margin-top:12px}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:12px}
+.card-label{display:flex;align-items:center;gap:10px;font-weight:600;margin-bottom:12px}
+.card-hint{color:var(--muted);font-size:13px;margin:10px 2px 0;line-height:1.45}
+.dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex:none}
+.dot svg{width:16px;height:16px}
+.dot.green{background:var(--green);color:#fff}.dot.red{background:var(--red);color:#fff}.dot.blue{background:var(--blue);color:#fff}.dot.orange{background:var(--orange);color:#fff}
+.field{display:flex;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:4px 14px}
+.field input{flex:1;min-width:0;border:0;background:transparent;font-size:30px;font-weight:700;padding:10px 0;outline:none;letter-spacing:.02em}
+.field input[type=date]{font-size:18px}
+.field.md input{font-size:24px}
+.field.sm input{font-size:18px;font-weight:600;letter-spacing:0}
+.field input::placeholder{color:var(--muted);opacity:.6;font-weight:500}
+.field span{color:var(--muted);font-weight:600;white-space:nowrap}
+.field:focus-within{border-color:var(--blue)}
+.err{color:var(--red);font-size:14px;margin-top:10px;min-height:1em}
+.intro{display:flex;gap:14px;align-items:center;background:var(--blue-soft);border:1px solid var(--blue);border-radius:18px;padding:14px 16px;font-size:14px;line-height:1.5}
+.intro > svg{width:64px;height:42px;flex:none}
+
+/* timer */
+.timer{display:flex;align-items:center;gap:14px;background:var(--green-soft);border:1px solid var(--green);border-radius:18px;padding:14px 16px;margin-top:12px}
+.timer .pulse{width:12px;height:12px;border-radius:50%;background:var(--green);flex:none;animation:pulse 1.6s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.6)}100%{box-shadow:0 0 0 12px rgba(34,197,94,0)}}
+@media (prefers-reduced-motion:reduce){.timer .pulse{animation:none}}
+.timer b{font-size:26px;font-variant-numeric:tabular-nums;display:block}
+.timer small{color:var(--muted)}
+
+.alert{display:flex;gap:12px;align-items:center;background:var(--orange-soft);border:1px solid var(--orange);color:var(--text);border-radius:16px;padding:12px 14px;margin-top:12px;font-size:14px}
+.alert svg{width:22px;height:22px;color:var(--orange);flex:none}
+
+/* result */
+.success{display:flex;gap:14px;align-items:center;background:var(--green-soft);border:1px solid var(--green);border-radius:18px;padding:18px}
+.success .check{width:48px;height:48px;border-radius:50%;background:var(--green);display:grid;place-items:center;color:#fff;flex:none}
+.success h3{margin:0 0 4px;font-size:20px}
+.success p{margin:0;color:var(--muted);font-size:13.5px}
+.rows .row{display:flex;align-items:center;gap:12px;padding:14px 0}
+.rows .row+.row{border-top:1px solid var(--line)}
+.rows .row svg{width:26px;height:26px;color:var(--blue);flex:none}
+.rows .row .lbl{flex:1;color:var(--muted)}
+.rows .row .val{text-align:right;font-weight:800;font-size:17px}
+.rows .row .val small{display:block;font-weight:500;color:var(--muted);font-size:12px}
+.note{display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--muted);line-height:1.5}
+.note svg{width:30px;height:30px;color:var(--blue);flex:none}
+.note b{color:var(--text)}
+
+/* history */
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chips.wrap{flex-wrap:wrap;overflow:visible}
+.chip{border:0;background:var(--surface2);border-radius:999px;padding:9px 16px;font-weight:600;font-size:14px;white-space:nowrap}
+.chip.on{background:var(--blue);color:var(--on-accent)}
+.totals{display:flex;justify-content:space-between;color:var(--muted);font-size:14px;margin:14px 2px 2px}
+.totals b{color:var(--text)}
+.item{display:flex;align-items:center;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-top:10px}
+.item .main{flex:1}
+.item .d{font-weight:700;margin-bottom:8px}
+.item .d span{color:var(--muted);font-weight:500;margin-left:8px}
+.item .m{display:flex;gap:22px;font-size:14.5px;font-weight:600}
+.item .m span{display:flex;align-items:center;gap:6px}
+.item .m svg{width:18px;height:18px}
+.item > svg{width:18px;height:18px;color:var(--muted)}
+.c-green{color:var(--green)}.c-blue{color:var(--blue)}.c-orange{color:var(--orange)}
+.empty{text-align:center;color:var(--muted);padding:36px 16px}
+.empty p{margin:0 0 6px}
+.empty .btn{max-width:260px;margin:14px auto 0}
+
+/* tank */
+.tank-wrap{display:flex;gap:18px;align-items:center}
+.tank{width:92px;height:150px;border:3px solid var(--line);border-radius:18px;position:relative;overflow:hidden;background:var(--bg);flex:none}
+.tank .fuel{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,var(--blue),#1d4ed8);transition:height .6s ease}
+.tank .fuel.low{background:linear-gradient(180deg,var(--orange),#b45309)}
+.tank .ticks{position:absolute;inset:0;background:repeating-linear-gradient(180deg,transparent 0 36px,var(--line) 36px 37px);opacity:.6}
+.tank-info .big{font-size:40px;font-weight:800;line-height:1}
+.tank-info .big small{font-size:18px;color:var(--muted);font-weight:600}
+.tank-info p{margin:8px 0 0;color:var(--muted);font-size:14px}
+.tank-info p b{color:var(--text)}
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font-size:11px;font-family:inherit}
+.section-title{font-weight:700;margin:22px 2px 2px;font-size:16px}
+.fill-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;font-size:15px}
+.fill-item+.fill-item{border-top:1px solid var(--line)}
+.fill-item small{color:var(--muted);display:block;font-size:12.5px}
+.fill-item .x{border:0;background:transparent;color:var(--muted);padding:6px}
+
+/* settings */
+.set-row{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;background:transparent;padding:14px 0}
+.set-row+.set-row{border-top:1px solid var(--line)}
+.set-row > svg:first-child{width:24px;height:24px;color:var(--blue);flex:none}
+.set-row .t{flex:1;min-width:0}
+.set-row .t b{display:block;font-weight:600}
+.set-row .t small{color:var(--muted)}
+.set-row > svg:last-child:not(:first-child){width:18px;height:18px;color:var(--muted);flex:none}
+.set-row .badge{font-size:11.5px;font-weight:700;color:var(--green);background:var(--green-soft);border-radius:999px;padding:3px 8px;margin-left:6px}
+.card.list{padding:2px 16px}
+
+/* nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+nav.tabs .in{max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+nav.tabs button{border:0;background:transparent;padding:10px 0 12px;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);font-size:12px;font-weight:600}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button.on{color:var(--blue)}
+
+/* sheet */
+.backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:10}
+.backdrop.open{display:block}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:11;transform:translateY(105%);transition:transform .25s ease}
+.sheet.open{transform:none}
+.sheet .in{max-width:480px;margin:0 auto;background:var(--surface);border-radius:22px 22px 0 0;padding:10px 18px calc(20px + env(safe-area-inset-bottom,0px));border:1px solid var(--line);border-bottom:0;max-height:85vh;overflow-y:auto}
+.sheet .grab{width:40px;height:4px;border-radius:4px;background:var(--line);margin:0 auto 14px}
+.sheet h3{margin:0 0 12px;font-size:18px}
+.quick{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.quick button{border:1px solid var(--line);background:var(--surface2);border-radius:12px;padding:10px 14px;font-weight:700}
+.toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;background:var(--text);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;font-size:14px;transition:.25s;z-index:20;pointer-events:none;max-width:90%;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.muted{color:var(--muted)}
+.foot{text-align:center;color:var(--muted);font-size:12.5px;margin-top:22px}
+
+/* gate / loading */
+.gate{min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:24px}
+.gate > svg{width:120px;height:80px}
+.gate p{margin:0;color:var(--muted);line-height:1.5;max-width:300px}
+.gate .btn{max-width:260px}
+.spin{width:28px;height:28px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--blue);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body class="no-nav">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="exc" viewBox="0 0 120 80">
+      <rect x="8" y="58" width="66" height="15" rx="7.5" fill="#2a3142"/>
+      <circle cx="16" cy="65.5" r="4" fill="#4b5569"/><circle cx="41" cy="65.5" r="4" fill="#4b5569"/><circle cx="66" cy="65.5" r="4" fill="#4b5569"/>
+      <rect x="14" y="42" width="52" height="16" rx="3" fill="#f5a524"/>
+      <path d="M38 42V22h20l6 20z" fill="#f5a524"/>
+      <path d="M42 39V26h13l4 13z" fill="#9fd3ff" opacity=".85"/>
+      <line x1="62" y1="44" x2="88" y2="14" stroke="#f5a524" stroke-width="8" stroke-linecap="round"/>
+      <line x1="88" y1="14" x2="103" y2="44" stroke="#e0931a" stroke-width="6" stroke-linecap="round"/>
+      <path d="M97 43h15l-4 15q-9 3-13-7z" fill="#2a3142"/>
+    </symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-fuel" viewBox="0 0 24 24"><path d="M4 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16M3 21h13M7 7h5v4H7zM15 9h2a2 2 0 0 1 2 2v6a1.5 1.5 0 0 0 3 0V8l-3-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" fill="currentColor"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 9h10M7 13h10M7 17h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z" fill="currentColor"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3l10 18H2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4M12 17.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-tank" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 13h16" stroke="currentColor" stroke-width="2"/><path d="M9 3h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M11 18h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 12h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  </defs>
+</svg>
+
+<div class="app">
+
+  <!-- LOADING / GATE -->
+  <section class="screen active" id="s-loading"><div class="gate"><div class="spin"></div></div></section>
+  <section class="screen" id="s-gate">
+    <div class="gate">
+      <svg><use href="#exc"/></svg>
+      <h2 style="margin:0">WorkFuel</h2>
+      <p id="g-msg"></p>
+      <button class="btn btn-primary" id="g-btn"></button>
+    </div>
+  </section>
+
+  <!-- MACHINE FORM (onboarding + edit) -->
+  <section class="screen" id="s-machine">
+    <div class="topbar"><button class="icon-btn" id="m-back" aria-label="back"><svg><use href="#i-back"/></svg></button><h2 id="m-title"></h2><span></span></div>
+    <div class="intro" id="m-intro"><svg><use href="#exc"/></svg><div data-t="mIntro"></div></div>
+    <div class="card">
+      <div class="card-label"><span class="dot orange"><svg><use href="#i-tag"/></svg></span><span data-t="mType"></span></div>
+      <div class="chips wrap" id="m-types"></div>
+    </div>
+    <div class="card">
+      <div class="card-label"><span class="dot blue"><svg><use href="#i-edit"/></svg></span><span data-t="mName"></span></div>
+      <div class="field sm"><input type="text" id="m-name" maxlength="40" autocomplete="off" data-ph="mNamePh"></div>
+      <div class="field sm" style="margin-top:10px"><input type="text" id="m-plate" maxlength="16" autocomplete="off" data-ph="mPlate"></div>
+    </div>
+    <div class="card">
+      <div class="card-label"><span class="dot blue"><svg><use href="#i-tank"/></svg></span><span data-t="mCap"></span></div>
+      <div class="field md"><input type="text" inputmode="decimal" id="m-cap" placeholder="200"><span data-t="liters"></span></div>
+      <div class="quick" id="m-cap-q"></div>
+    </div>
+    <div class="card">
+      <div class="card-label"><span class="dot blue"><svg><use href="#i-fuel"/></svg></span><span data-t="mNorm"></span></div>
+      <div class="field md"><input type="text" inputmode="decimal" id="m-norm" placeholder="10"><span data-t="lph"></span></div>
+      <div class="quick" id="m-norm-q"></div>
+      <p class="card-hint" data-t="mNormHint"></p>
+    </div>
+    <div class="card" id="m-now-card">
+      <div class="card-label"><span class="dot green"><svg><use href="#i-drop"/></svg></span><span data-t="mNow"></span></div>
+      <div class="field md"><input type="text" inputmode="decimal" id="m-now"><span data-t="liters"></span></div>
+      <p class="card-hint" data-t="mNowHint"></p>
+    </div>
+    <div class="card">
+      <div class="card-label"><span class="dot orange"><svg><use href="#i-bell"/></svg></span><span data-t="mLow"></span></div>
+      <div class="field md"><input type="text" inputmode="numeric" id="m-low" value="20"><span>%</span></div>
+    </div>
+    <div class="err" id="m-err" role="alert"></div>
+    <button class="btn btn-primary" id="m-save"></button>
+    <button class="btn btn-danger" id="m-del"></button>
+  </section>
+
+  <!-- HOME -->
+  <section class="screen" id="s-home">
+    <div class="brand">
+      <svg><use href="#exc"/></svg>
+      <button class="mpick" id="h-mpick"><h1>WorkFuel</h1><p><span id="h-mname"></span><svg><use href="#i-down"/></svg></p></button>
+      <button class="icon-btn" data-go="profile" aria-label="settings"><svg><use href="#i-gear"/></svg></button>
+    </div>
+    <div class="hero">
+      <svg viewBox="0 0 360 170" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Excavator">
+        <defs>
+          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a6ea5"/><stop offset=".7" stop-color="#e9b872"/><stop offset="1" stop-color="#f4c98a"/></linearGradient>
+          <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1"><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient>
+        </defs>
+        <rect width="360" height="170" fill="url(#sky)"/>
+        <circle cx="290" cy="70" r="16" fill="#fff3c9" opacity=".9"/>
+        <path d="M0 110 L50 70 L95 100 L150 55 L210 98 L260 72 L320 104 L360 86 V170 H0z" fill="#46607a" opacity=".75"/>
+        <path d="M0 125 L70 98 L130 118 L200 92 L270 120 L360 102 V170 H0z" fill="#2f4a3a"/>
+        <path d="M0 138 Q120 126 220 136 T360 132 V170 H0z" fill="#6b4a2c"/>
+        <path d="M232 148 q20 -14 44 -6 q14 5 20 14 H232z" fill="#553820"/>
+        <use href="#exc" x="110" y="60" width="160" height="106"/>
+        <rect width="360" height="170" fill="url(#shade)"/>
+      </svg>
+      <div class="hero-title" data-t="todayWork"></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><svg class="c-blue"><use href="#i-clock"/></svg><small data-t="workTime"></small><b id="h-time"></b></div>
+      <div class="stat"><svg class="c-blue"><use href="#i-fuel"/></svg><small data-t="spent"></small><b id="h-fuel"></b></div>
+      <div class="stat"><svg class="c-green" id="h-tank-ic"><use href="#i-tank"/></svg><small data-t="inTank"></small><b id="h-tank"></b></div>
+    </div>
+    <div id="h-alert"></div>
+    <div id="h-timer"></div>
+    <div id="h-actions"></div>
+    <button class="btn btn-ghost" data-go="history"><svg><use href="#i-list"/></svg><span data-t="viewHistory"></span></button>
+  </section>
+
+  <!-- ENTRY -->
+  <section class="screen" id="s-entry">
+    <div class="topbar"><button class="icon-btn" data-go="home" aria-label="back"><svg><use href="#i-back"/></svg></button><h2 id="e-title"></h2><span></span></div>
+    <div class="card">
+      <div class="card-label"><span class="dot blue"><svg><use href="#i-list"/></svg></span><span data-t="date"></span></div>
+      <div class="field"><input type="date" id="e-date"></div>
+    </div>
+    <div class="card">
+      <div class="card-label"><span class="dot green"><svg><use href="#i-play"/></svg></span><span data-t="startTime"></span></div>
+      <div class="field"><input type="time" id="e-start" value="08:00"></div>
+    </div>
+    <div class="card">
+      <div class="card-label"><span class="dot red"><svg><use href="#i-stop"/></svg></span><span data-t="endTime"></span></div>
+      <div class="field"><input type="time" id="e-end" value="17:00"></div>
+    </div>
+    <div class="card">
+      <div class="card-label"><span class="dot blue"><svg><use href="#i-fuel"/></svg></span><span data-t="normPerHour"></span></div>
+      <div class="field"><input type="text" inputmode="decimal" id="e-norm"><span data-t="lph"></span></div>
+    </div>
+    <div class="err" id="e-err" role="alert"></div>
+    <button class="btn btn-primary" id="e-save"><svg><use href="#i-check"/></svg><span data-t="calcSave"></span></button>
+  </section>
+
+  <!-- RESULT -->
+  <section class="screen" id="s-result">
+    <div class="topbar"><button class="icon-btn" data-go="home" aria-label="back"><svg><use href="#i-back"/></svg></button><h2 data-t="result"></h2><span></span></div>
+    <div class="success"><div class="check"><svg width="26" height="26"><use href="#i-check"/></svg></div><div><h3 data-t="saved"></h3><p data-t="savedSub"></p></div></div>
+    <div class="card rows" id="r-rows"></div>
+    <div class="card note" id="r-note"></div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" data-go="home" data-t="toHome"></button>
+      <button class="btn btn-primary" id="r-again"><svg><use href="#i-plus"/></svg><span data-t="again"></span></button>
+    </div>
+  </section>
+
+  <!-- HISTORY -->
+  <section class="screen" id="s-history">
+    <div class="topbar"><button class="icon-btn" data-go="home" aria-label="back"><svg><use href="#i-back"/></svg></button><h2 data-t="history"></h2><span></span></div>
+    <div class="chips" id="chips">
+      <button class="chip on" data-f="all" data-t="all"></button>
+      <button class="chip" data-f="today" data-t="today"></button>
+      <button class="chip" data-f="week" data-t="week"></button>
+      <button class="chip" data-f="month" data-t="month"></button>
+    </div>
+    <div class="totals" id="hist-totals"></div>
+    <div id="hist-list"></div>
+  </section>
+
+  <!-- TANK -->
+  <section class="screen" id="s-tank">
+    <div class="topbar"><button class="icon-btn" data-go="home" aria-label="back"><svg><use href="#i-back"/></svg></button><h2 data-t="calc"></h2><span></span></div>
+    <div class="card">
+      <div class="tank-wrap">
+        <div class="tank" aria-hidden="true"><div class="fuel" id="t-fuel"></div><div class="ticks"></div></div>
+        <div class="tank-info">
+          <div class="muted" style="font-size:14px;margin-bottom:6px" data-t="inTank"></div>
+          <div class="big" id="t-liters"></div>
+          <p id="t-pct"></p>
+          <p id="t-hours"></p>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-green" id="t-fill"><svg><use href="#i-fuel"/></svg><span data-t="fillBtn"></span></button>
+      <button class="btn btn-ghost" id="t-set"><svg><use href="#i-edit"/></svg><span data-t="exactBtn"></span></button>
+    </div>
+    <div class="section-title" data-t="last7"></div>
+    <div class="card"><svg class="chart" id="t-chart" viewBox="0 0 340 170"></svg></div>
+    <div class="section-title" data-t="byMonth"></div>
+    <div class="card rows" id="t-month"></div>
+    <div class="section-title" data-t="filledFuel"></div>
+    <div class="card" id="t-fills"></div>
+  </section>
+
+  <!-- PROFILE -->
+  <section class="screen" id="s-profile">
+    <div class="topbar"><button class="icon-btn" data-go="home" aria-label="back"><svg><use href="#i-back"/></svg></button><h2 data-t="settings"></h2><span></span></div>
+    <div class="section-title" data-t="machines"></div>
+    <div class="card list" id="p-machines"></div>
+    <div class="section-title" data-t="account"></div>
+    <div class="card list">
+      <div class="set-row"><svg><use href="#i-user"/></svg><span class="t"><b id="p-name"></b><small id="p-user"></small></span></div>
+      <div class="set-row"><svg><use href="#i-phone"/></svg><span class="t"><b data-t="phone"></b><small id="p-phone"></small></span></div>
+      <button class="set-row" id="p-lang"><svg><use href="#i-globe"/></svg><span class="t"><b data-t="language"></b><small id="p-lang-v"></small></span><svg><use href="#i-next"/></svg></button>
+    </div>
+    <div class="card list">
+      <div class="set-row"><svg><use href="#i-info"/></svg><span class="t"><b data-t="about"></b><small data-t="aboutSub"></small></span></div>
+    </div>
+    <p class="foot" data-t="foot"></p>
+  </section>
+</div>
+
+<nav class="tabs">
+  <div class="in">
+    <button data-go="home" class="on"><svg><use href="#i-home"/></svg><span data-t="home"></span></button>
+    <button data-go="history"><svg><use href="#i-list"/></svg><span data-t="history"></span></button>
+    <button data-go="tank"><svg><use href="#i-drop"/></svg><span data-t="calc"></span></button>
+    <button data-go="profile"><svg><use href="#i-user"/></svg><span data-t="profile"></span></button>
+  </div>
+</nav>
+
+<div class="backdrop" id="backdrop"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="in"><div class="grab"></div><div id="sheet-body"></div></div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  'use strict';
+  // ---------- i18n ----------
+  const I18N = {
+    uz: {
+      appSub:"Ish va yonilg'i nazorati", todayWork:'Bugungi ish', workTime:'Ish vaqti', spent:'Sarflandi', inTank:'Bakda qoldi',
+      lowAlert:"Bakda <b>{l} l</b> qoldi ({p}%). Salyarka quyish kerak.", runningSince:'Ish ketmoqda, {t} dan beri',
+      stopWork:"Ishni to'xtatish", startWork:'Yangi ish boshlash', manual:"Vaqtni qo'lda kiritish", viewHistory:"Tarixni ko'rish",
+      workStarted:'Ish boshlandi', lessMin:"1 daqiqadan kam, yozilmadi", edit:'Tahrirlash', date:'Sana',
+      startTime:'Ish boshlash vaqti', endTime:"Ish to'xtatish vaqti", normPerHour:"Soatiga yonilg'i (litr)", calcSave:'Hisoblash va saqlash',
+      errDate:'Sanani tanlang.', errTimes:"Boshlash va to'xtatish vaqtini kiriting.", errSame:"Boshlash va to'xtatish vaqti bir xil bo'lmasin.",
+      errNorm:"Soatiga yonilg'i 0 dan katta son bo'lishi kerak.", result:'Natija', saved:'Saqlandi', savedSub:'Ish vaqti va sarf tarixga yozildi.',
+      fuelUse:"Yonilg'i sarfi", byNorm:"{n} l/soat bo'yicha", enoughFor:'~{d} ishga yetadi',
+      resultNote:"Soatiga {n} litr yonilg'i sarflansa, {d}da jami <b>{l} litr</b> yonilg'i ketadi.",
+      toHome:'Asosiyga', again:'Yana kiritish', history:'Tarix', all:'Barcha', today:'Bugun', week:'Bu hafta', month:'Bu oy',
+      total:'Jami', liters:'litr', l:'l', emptyPeriod:"Bu davrda yozuv yo'q.", emptyHint:"Ish vaqtini kiriting, shu yerda ko'rinadi.",
+      addEntry:'Ish vaqtini kiritish', time:'Vaqt', use:'Sarf', del:"O'chirish", confirm:'Tasdiqlash', deleted:"O'chirildi",
+      calc:'Hisob-kitob', fillBtn:'Salyarka quydim', exactBtn:'Aniq miqdor', pctFull:"{p}% to'la", approxHours:'Taxminan <b>{d}</b> ishga yetadi',
+      last7:'Oxirgi 7 kun sarfi (litr)', byMonth:"Oy bo'yicha", filledFuel:'Quyilgan salyarka', workedTime:'Ishlangan vaqt', workDays:'{n} ish kuni',
+      spentL:'Sarflangan', filled:'Quyilgan', fullNotCounted:"\"To'la bak\" hisobga kirmagan", fullTank:"To'la bak", exactAmt:'Aniq miqdor: {l} l',
+      noFills:'Hali salyarka quyilmagan.', howMuchFill:'Qancha salyarka quydingiz?', tankFilled:"Bak to'ldirildi", enterLiters:'Litrni kiriting, masalan 100.',
+      overCap:'Bak hajmidan oshdi, {c} l deb olindi', added:"{l} litr qo'shildi", exactQ:'Bakda hozir aniq qancha bor?',
+      exactHint:"Hisob bilan haqiqiy qoldiq farq qilsa, shu yerda to'g'rilang.", range:'0 dan {c} gacha son kiriting.', leftUpdated:'Qoldiq yangilandi',
+      save:'Saqlash', cancel:'Bekor qilish', profile:'Profil', home:'Asosiy', settings:'Sozlamalar', machines:'Texnikalar',
+      addMachine:"Texnika qo'shish", newMachine:"Yangi texnika qo'shish", editMachine:'Texnikani tahrirlash',
+      mIntro:"Boshlash uchun texnikangiz haqida ma'lumot kiriting. Yonilg'i sarfi va bakdagi qoldiq shu ma'lumotlar asosida hisoblanadi.",
+      mType:'Texnika turi', mName:'Nomi va davlat raqami', mNamePh:'Nomi yoki modeli, masalan: JCB 220', mPlate:'Davlat raqami (ixtiyoriy)',
+      mCap:"Bak sig'imi", mNorm:"Soatiga yonilg'i sarfi", mNormHint:"Texnika 1 soat ishlaganda o'rtacha necha litr yoqadi.",
+      mNow:'Hozir bakda qancha bor', mNowHint:"Bo'sh qoldirsangiz, bak to'la deb olinadi.", mLow:'Kam qolganda ogohlantirish',
+      mSaveFirst:'Saqlash va boshlash', errName:'Texnika nomini kiriting.', errCap:"Bak sig'imini litrda kiriting (1–5000).",
+      errNow:"Bakdagi miqdor 0 dan {c} gacha bo'lsin.", errLow:"Ogohlantirish 0–90% oralig'ida bo'lsin.", lph:'l/soat',
+      machineSaved:'Texnika saqlandi', delMachineQ:"{n} o'chirilsinmi?",
+      delMachineHint:"Shu texnikaning barcha ish vaqtlari va salyarka yozuvlari ham o'chadi. Buni qaytarib bo'lmaydi.",
+      active:'Faol', chooseMachine:'Texnikani tanlang', switched:'{n} tanlandi', lowAt:'{p}% dan kam qolganda',
+      mSummary:"{c} l bak · {n} l/soat", language:'Til', phone:'Telefon', account:'Hisob', about:'Dastur haqida',
+      aboutSub:"WorkFuel 1.0. Ma'lumotlar serverda saqlanadi.", foot:"Ishingiz nazoratda, yonilg'ingiz behuda ketmaydi.",
+      gateNoTg:'Bu ilova Telegram bot orqali ochiladi.', gateNoReg:"Avval botda /start bosing va telefon raqamingizni yuboring.",
+      gateErr:"Server bilan bog'lanib bo'lmadi. Internetni tekshirib, qayta urinib ko'ring.", retry:'Qayta urinish', close:'Yopish',
+      offline:"Internet yo'q: ma'lumot qurilmada saqlandi, keyin yuboriladi.", langSaved:"Til o'zgartirildi", min:'daq', hour:'soat',
+      types:{excavator:'Ekskavator',bulldozer:'Buldozer',loader:'Yuklagich',grader:'Greyder',crane:'Avtokran',roller:'Katok',tractor:'Traktor',truck:'Yuk mashinasi',other:'Boshqa'}
+    },
+    ru: {
+      appSub:'Учёт работы и топлива', todayWork:'Сегодня', workTime:'Время работы', spent:'Израсходовано', inTank:'В баке',
+      lowAlert:'В баке осталось <b>{l} л</b> ({p}%). Пора заправиться.', runningSince:'Работа идёт с {t}',
+      stopWork:'Остановить работу', startWork:'Начать работу', manual:'Ввести время вручную', viewHistory:'История',
+      workStarted:'Работа начата', lessMin:'Меньше 1 минуты, не записано', edit:'Редактировать', date:'Дата',
+      startTime:'Начало работы', endTime:'Окончание работы', normPerHour:'Расход в час (литры)', calcSave:'Рассчитать и сохранить',
+      errDate:'Выберите дату.', errTimes:'Укажите время начала и окончания.', errSame:'Время начала и окончания не должны совпадать.',
+      errNorm:'Расход должен быть больше 0.', result:'Результат', saved:'Сохранено', savedSub:'Время и расход записаны в историю.',
+      fuelUse:'Расход топлива', byNorm:'по {n} л/ч', enoughFor:'хватит на ~{d}',
+      resultNote:'При расходе {n} л/ч за {d} уходит <b>{l} л</b> топлива.',
+      toHome:'На главную', again:'Ещё запись', history:'История', all:'Все', today:'Сегодня', week:'Неделя', month:'Месяц',
+      total:'Итого', liters:'л', l:'л', emptyPeriod:'За этот период записей нет.', emptyHint:'Добавьте время работы — оно появится здесь.',
+      addEntry:'Добавить время работы', time:'Время', use:'Расход', del:'Удалить', confirm:'Подтвердить', deleted:'Удалено',
+      calc:'Расчёты', fillBtn:'Заправился', exactBtn:'Точный остаток', pctFull:'заполнено на {p}%', approxHours:'Хватит примерно на <b>{d}</b>',
+      last7:'Расход за 7 дней (л)', byMonth:'За месяц', filledFuel:'Заправки', workedTime:'Отработано', workDays:'рабочих дней: {n}',
+      spentL:'Израсходовано', filled:'Заправлено', fullNotCounted:'«Полный бак» не учитывается', fullTank:'Полный бак', exactAmt:'Точный остаток: {l} л',
+      noFills:'Заправок пока нет.', howMuchFill:'Сколько топлива залили?', tankFilled:'Бак заполнен', enterLiters:'Введите литры, например 100.',
+      overCap:'Больше объёма бака, принято {c} л', added:'Добавлено {l} л', exactQ:'Сколько сейчас в баке?',
+      exactHint:'Если расчёт расходится с фактом — поправьте здесь.', range:'Введите число от 0 до {c}.', leftUpdated:'Остаток обновлён',
+      save:'Сохранить', cancel:'Отмена', profile:'Профиль', home:'Главная', settings:'Настройки', machines:'Техника',
+      addMachine:'Добавить технику', newMachine:'Добавить технику', editMachine:'Редактировать технику',
+      mIntro:'Для начала укажите данные техники. По ним рассчитываются расход и остаток топлива.',
+      mType:'Тип техники', mName:'Название и госномер', mNamePh:'Название или модель, например: JCB 220', mPlate:'Госномер (необязательно)',
+      mCap:'Объём бака', mNorm:'Расход топлива в час', mNormHint:'Сколько литров в среднем уходит за 1 час работы.',
+      mNow:'Сколько сейчас в баке', mNowHint:'Если оставить пустым — считаем бак полным.', mLow:'Предупреждать при остатке',
+      mSaveFirst:'Сохранить и начать', errName:'Укажите название техники.', errCap:'Укажите объём бака в литрах (1–5000).',
+      errNow:'Остаток должен быть от 0 до {c}.', errLow:'Порог — от 0 до 90%.', lph:'л/ч',
+      machineSaved:'Техника сохранена', delMachineQ:'Удалить {n}?',
+      delMachineHint:'Удалятся также все записи работы и заправок этой техники. Отменить нельзя.',
+      active:'Активна', chooseMachine:'Выберите технику', switched:'Выбрано: {n}', lowAt:'при остатке менее {p}%',
+      mSummary:'бак {c} л · {n} л/ч', language:'Язык', phone:'Телефон', account:'Аккаунт', about:'О приложении',
+      aboutSub:'WorkFuel 1.0. Данные хранятся на сервере.', foot:'Работа под контролем, топливо — без потерь.',
+      gateNoTg:'Приложение открывается через Telegram-бота.', gateNoReg:'Сначала нажмите /start в боте и отправьте номер телефона.',
+      gateErr:'Не удалось связаться с сервером. Проверьте интернет и попробуйте снова.', retry:'Повторить', close:'Закрыть',
+      offline:'Нет сети: данные сохранены на устройстве и будут отправлены позже.', langSaved:'Язык изменён', min:'мин', hour:'ч',
+      types:{excavator:'Экскаватор',bulldozer:'Бульдозер',loader:'Погрузчик',grader:'Грейдер',crane:'Автокран',roller:'Каток',tractor:'Трактор',truck:'Грузовик',other:'Другое'}
+    }
+  };
+  const TYPE_KEYS = ['excavator','bulldozer','loader','grader','crane','roller','tractor','truck','other'];
+  let LANG = 'uz';
+  const t = (k, v) => { let s = (I18N[LANG][k] ?? I18N.uz[k] ?? k); if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; };
+  const typeName = k => (I18N[LANG].types[k] || I18N[LANG].types.other);
+  function applyStatic(){
+    document.documentElement.lang = LANG;
+    document.querySelectorAll('[data-t]').forEach(el => { el.textContent = t(el.dataset.t); });
+    document.querySelectorAll('[data-ph]').forEach(el => { el.placeholder = t(el.dataset.ph); });
+  }
+
+  // ---------- helpers ----------
+  const $ = s => document.querySelector(s);
+  const $$ = s => Array.from(document.querySelectorAll(s));
+  const pad = n => String(n).padStart(2,'0');
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const num = v => { const n = parseFloat(String(v).replace(',', '.').trim()); return isFinite(n) ? n : NaN; };
+  const ymd = d => d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+  const today = () => ymd(new Date());
+  const fmtDate = s => { const [y,m,d] = s.split('-'); return d + '.' + m + '.' + y; };
+  const fmtL = x => (Math.round(x*10)/10).toFixed(1);
+  const fmtDur = min => { min = Math.round(min); const h = Math.floor(min/60), m = min%60;
+    if (!h) return m + ' ' + t('min'); if (!m) return h + ' ' + t('hour'); return h + ' ' + t('hour') + ' ' + m + ' ' + t('min'); };
+  const hhmm = d => pad(d.getHours()) + ':' + pad(d.getMinutes());
+  const ico = id => `<svg><use href="#${id}"/></svg>`;
+
+  // ---------- Telegram ----------
+  const tg = window.Telegram && window.Telegram.WebApp;
+  const inTg = !!(tg && tg.initData);
+  const initData = inTg ? tg.initData : '';
+  const haptic = kind => { try { tg && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred(kind); } catch(e) {} };
+  function applyTheme(){
+    if (!tg || !tg.colorScheme) return;
+    document.documentElement.dataset.theme = tg.colorScheme;
+    const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+    try { tg.setHeaderColor(bg); tg.setBackgroundColor(bg); if (tg.setBottomBarColor) tg.setBottomBarColor(bg); } catch(e) {}
+  }
+  if (tg) {
+    try { tg.ready(); tg.expand(); if (tg.disableVerticalSwipes) tg.disableVerticalSwipes(); } catch(e) {}
+    applyTheme(); tg.onEvent('themeChanged', applyTheme);
+    if (inTg) document.body.classList.add('tg');
+    tg.BackButton.onClick(() => { if ($('#sheet').classList.contains('open')) closeSheet(); else back(); });
+  }
+
+  // ---------- state ----------
+  const blank = () => ({ v:2, machines:[], activeId:null, sessions:[], fills:[], timer:null });
+  let S = blank(), PROFILE = {}, CACHE_KEY = 'workfuel.v2';
+  const M = () => S.machines.find(m => m.id === S.activeId) || S.machines[0] || null;
+  const mById = id => S.machines.find(m => m.id === id);
+  const ofM = (list, m) => list.filter(x => x.machineId === (m || M() || {}).id);
+
+  function cache(pending){
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ S, pending })); } catch(e) {}
+  }
+  function readCache(){
+    try { return JSON.parse(localStorage.getItem(CACHE_KEY)); } catch(e) { return null; }
+  }
+  async function api(method, url, body, keepalive){
+    const r = await fetch(url, { method, keepalive: !!keepalive, headers: { 'content-type':'application/json', 'x-init-data': initData },
+      body: body === undefined ? undefined : JSON.stringify(body) });
+    if (!r.ok) { const e = new Error('http ' + r.status); e.status = r.status; throw e; }
+    return r.json();
+  }
+  let syncT, dirty = false, warned = false;
+  function save(){ dirty = true; cache(true); clearTimeout(syncT); syncT = setTimeout(sync, 600); }
+  async function sync(keepalive){
+    if (!dirty) return;
+    dirty = false;
+    try { await api('PUT', '/api/state', S, keepalive); cache(false); warned = false; }
+    catch(e) {
+      dirty = true;
+      if (!warned) { warned = true; toast(t('offline')); }
+      clearTimeout(syncT); syncT = setTimeout(sync, 10000);
+    }
+  }
+  document.addEventListener('visibilitychange', () => { if (document.hidden) sync(true); });
+
+  // ---------- calculations ----------
+  const minutesBetween = (a, b) => { const [ah,am] = a.split(':').map(Number), [bh,bm] = b.split(':').map(Number);
+    let d = (bh*60+bm) - (ah*60+am); if (d <= 0) d += 1440; return d; };
+  const endOf = s => { const d = new Date(s.date + 'T' + s.start); d.setMinutes(d.getMinutes() + s.minutes); return d; };
+  function tankLevel(m){
+    m = m || M(); if (!m) return 0;
+    const cap = m.cap;
+    const ev = [
+      ...ofM(S.sessions, m).map(s => ({ t: endOf(s).getTime(), kind:'use', v: s.liters })),
+      ...ofM(S.fills, m).map(f => ({ t: new Date(f.at).getTime(), kind: f.type, v: f.liters }))
+    ].sort((a,b) => a.t - b.t);
+    let lvl = m.initialTank;
+    for (const e of ev) {
+      if (e.kind === 'set') lvl = e.v;
+      else if (e.kind === 'full') lvl = cap;
+      else if (e.kind === 'fill') lvl += e.v;
+      else if (e.kind === 'use') lvl -= e.v;
+      lvl = Math.max(0, Math.min(cap, lvl));
+    }
+    return lvl;
+  }
+  const sumFor = list => list.reduce((a,s) => ({ min: a.min + s.minutes, l: a.l + s.liters }), { min:0, l:0 });
+  function inRange(s, f){
+    if (f === 'all') return true;
+    const now = new Date(), d = new Date(s.date + 'T00:00');
+    if (f === 'today') return s.date === today();
+    if (f === 'month') return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    if (f === 'week') { const start = new Date(now); const dow = (now.getDay()+6)%7; start.setHours(0,0,0,0); start.setDate(now.getDate()-dow); return d >= start; }
+    return true;
+  }
+  const sorted = () => ofM(S.sessions).sort((a,b) => (b.date + b.start).localeCompare(a.date + a.start));
+
+  // ---------- navigation ----------
+  let current = 'loading', prev = 'home';
+  const MAIN = ['home','history','tank','profile'];
+  function go(name){
+    if (current !== name && current !== 'result') prev = current;
+    current = name;
+    $$('.screen').forEach(s => s.classList.toggle('active', s.id === 's-' + name));
+    $$('nav.tabs button').forEach(b => b.classList.toggle('on', b.dataset.go === name));
+    const firstSetup = name === 'machine' && !S.machines.length;
+    document.body.classList.toggle('no-nav', ['loading','gate'].includes(name) || firstSetup);
+    if (tg && inTg) { if (name === 'home' || ['loading','gate'].includes(name) || firstSetup) tg.BackButton.hide(); else tg.BackButton.show(); }
+    window.scrollTo(0,0);
+    render();
+  }
+  function back(){
+    if (current === 'machine') { if (!S.machines.length) return; go(MAIN.includes(prev) ? prev : 'home'); return; }
+    go('home');
+  }
+  document.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) go(b.dataset.go); });
+  $('#m-back').onclick = back;
+
+  // ---------- toast & sheet ----------
+  let tt;
+  function toast(msg){ const el = $('#toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => el.classList.remove('show'), 2400); }
+  function openSheet(html){
+    $('#sheet-body').innerHTML = html; $('#sheet').classList.add('open'); $('#backdrop').classList.add('open');
+    if (tg && inTg) tg.BackButton.show();
+    const i = $('#sheet-body input'); if (i) setTimeout(() => i.focus(), 250);
+  }
+  function closeSheet(){
+    $('#sheet').classList.remove('open'); $('#backdrop').classList.remove('open');
+    if (tg && inTg && (current === 'home' || (current === 'machine' && !S.machines.length))) tg.BackButton.hide();
+  }
+  $('#backdrop').addEventListener('click', closeSheet);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+
+  function askNumber({ title, value, unit, quick = [], extra = '', onSave }){
+    openSheet(`<h3>${esc(title)}</h3>
+      <div class="field"><input type="text" inputmode="decimal" id="sh-in" value="${esc(value ?? '')}"><span>${esc(unit)}</span></div>
+      ${quick.length ? `<div class="quick">${quick.map(q => `<button data-q="${esc(q.v)}">${esc(q.t)}</button>`).join('')}</div>` : ''}
+      ${extra}<div class="err" id="sh-err"></div>
+      <button class="btn btn-primary" id="sh-ok">${esc(t('save'))}</button>`);
+    $$('#sheet-body [data-q]').forEach(b => b.onclick = () => { $('#sh-in').value = b.dataset.q; });
+    $('#sh-ok').onclick = () => { const r = onSave($('#sh-in').value); if (r) $('#sh-err').textContent = r; else closeSheet(); };
+  }
+
+  // ---------- machine form ----------
+  let mEdit = null, mType = 'excavator';
+  function renderTypes(){
+    $('#m-types').innerHTML = TYPE_KEYS.map(k => `<button class="chip${k === mType ? ' on' : ''}" data-type="${k}">${esc(typeName(k))}</button>`).join('');
+  }
+  $('#m-types').addEventListener('click', e => { const c = e.target.closest('[data-type]'); if (!c) return; mType = c.dataset.type; renderTypes(); });
+  const quickFill = (sel, input, vals) => {
+    $(sel).innerHTML = vals.map(v => `<button data-v="${v}">${v}</button>`).join('');
+    $(sel).onclick = e => { const b = e.target.closest('[data-v]'); if (b) $(input).value = b.dataset.v; };
+  };
+  quickFill('#m-cap-q', '#m-cap', [100, 150, 200, 250, 300, 400]);
+  quickFill('#m-norm-q', '#m-norm', [5, 8, 10, 12, 15, 20]);
+
+  function openMachine(id){
+    mEdit = id || null;
+    const m = id ? mById(id) : null, first = !S.machines.length;
+    $('#m-title').textContent = t(m ? 'editMachine' : 'addMachine');
+    $('#m-intro').hidden = !first;
+    $('#m-back').style.visibility = (first || inTg) ? 'hidden' : 'visible';
+    mType = m ? m.type : 'excavator'; renderTypes();
+    $('#m-name').value = m ? m.name : '';
+    $('#m-plate').value = m ? (m.plate || '') : '';
+    $('#m-cap').value = m ? m.cap : '';
+    $('#m-norm').value = m ? m.norm : '';
+    $('#m-now').value = '';
+    $('#m-low').value = m ? m.low : 20;
+    $('#m-now-card').hidden = !!m;
+    $('#m-del').hidden = !m;
+    $('#m-del').textContent = t('del');
+    $('#m-save').innerHTML = ico('i-check') + esc(t(first ? 'mSaveFirst' : 'save'));
+    $('#m-err').textContent = '';
+    go('machine');
+  }
+  $('#m-save').onclick = () => {
+    const err = msg => { $('#m-err').textContent = msg; haptic('error'); };
+    const name = $('#m-name').value.trim(), plate = $('#m-plate').value.trim().toUpperCase();
+    const cap = num($('#m-cap').value), norm = num($('#m-norm').value), low = num($('#m-low').value);
+    const nowRaw = $('#m-now').value.trim(), now = nowRaw === '' ? cap : num(nowRaw);
+    if (!name) return err(t('errName'));
+    if (!(cap > 0 && cap <= 5000)) return err(t('errCap'));
+    if (!(norm > 0 && norm < 200)) return err(t('errNorm'));
+    if (!mEdit && !(now >= 0 && now <= cap)) return err(t('errNow', { c: cap }));
+    if (!(low >= 0 && low <= 90)) return err(t('errLow'));
+    if (mEdit) {
+      const m = mById(mEdit);
+      Object.assign(m, { type: mType, name, plate, cap, norm, low });
+      m.initialTank = Math.min(m.initialTank, cap);
+    } else {
+      const m = { id: uid(), type: mType, name, plate, cap, norm, low, initialTank: now, createdAt: new Date().toISOString() };
+      S.machines.push(m); S.activeId = m.id;
+    }
+    save(); haptic('success'); toast(t('machineSaved'));
+    go(mEdit ? 'profile' : 'home');
+  };
+  $('#m-del').onclick = () => {
+    const m = mById(mEdit); if (!m) return;
+    openSheet(`<h3>${esc(t('delMachineQ', { n: m.name }))}</h3><p class="muted">${esc(t('delMachineHint'))}</p>
+      <div class="btn-row"><button class="btn btn-ghost" id="sh-no">${esc(t('cancel'))}</button><button class="btn btn-danger" id="sh-yes">${esc(t('del'))}</button></div>`);
+    $('#sh-no').onclick = closeSheet;
+    $('#sh-yes').onclick = () => {
+      S.machines = S.machines.filter(x => x.id !== m.id);
+      S.sessions = S.sessions.filter(x => x.machineId !== m.id);
+      S.fills = S.fills.filter(x => x.machineId !== m.id);
+      if (S.timer && S.timer.machineId === m.id) S.timer = null;
+      if (S.activeId === m.id) S.activeId = S.machines[0] ? S.machines[0].id : null;
+      save(); closeSheet(); toast(t('deleted'));
+      if (!S.machines.length) openMachine(); else go('profile');
+    };
+  };
+
+  function pickMachine(){
+    const a = M();
+    openSheet(`<h3>${esc(t('chooseMachine'))}</h3><div class="card list" style="margin-top:0">
+      ${S.machines.map(m => `<button class="set-row" data-pick="${m.id}">${ico('i-tank')}<span class="t"><b>${esc(m.name)}${m.id === a.id ? `<span class="badge">${esc(t('active'))}</span>` : ''}</b><small>${esc(typeName(m.type))}${m.plate ? ' · ' + esc(m.plate) : ''}</small></span>${m.id === a.id ? ico('i-check') : ''}</button>`).join('')}
+      <button class="set-row" id="sh-new">${ico('i-plus')}<span class="t"><b>${esc(t('newMachine'))}</b></span>${ico('i-next')}</button></div>`);
+    $$('#sheet-body [data-pick]').forEach(b => b.onclick = () => {
+      S.activeId = b.dataset.pick; save(); closeSheet(); toast(t('switched', { n: M().name })); render();
+    });
+    $('#sh-new').onclick = () => { closeSheet(); openMachine(); };
+  }
+  $('#h-mpick').onclick = pickMachine;
+
+  // ---------- home ----------
+  let tick;
+  function renderHome(){
+    const m = M(); if (!m) return;
+    $('#h-mname').textContent = m.name + ' · ' + typeName(m.type);
+    const td = sumFor(ofM(S.sessions).filter(s => s.date === today()));
+    $('#h-time').textContent = fmtDur(td.min);
+    $('#h-fuel').textContent = fmtL(td.l) + ' ' + t('l');
+    const lvl = tankLevel(), pct = lvl / m.cap * 100, low = pct <= m.low;
+    $('#h-tank').textContent = Math.round(lvl) + ' ' + t('l');
+    $('#h-tank-ic').setAttribute('class', low ? 'c-orange' : 'c-green');
+    $('#h-alert').innerHTML = low ? `<div class="alert">${ico('i-warn')}<div>${t('lowAlert', { l: Math.round(lvl), p: Math.round(pct) })}</div></div>` : '';
+
+    clearInterval(tick);
+    if (S.timer) {
+      const tm = mById(S.timer.machineId);
+      const label = t('runningSince', { t: hhmm(new Date(S.timer.startAt)) }) + (tm && tm.id !== m.id ? ' · ' + tm.name : '');
+      $('#h-timer').innerHTML = `<div class="timer"><span class="pulse"></span><div style="flex:1"><small>${esc(label)}</small><b id="h-el">00:00:00</b></div></div>`;
+      $('#h-actions').innerHTML = `<button class="btn btn-danger" id="h-stop">${ico('i-stop')}${esc(t('stopWork'))}</button>`;
+      const upd = () => { const s = Math.max(0, Math.floor((Date.now() - new Date(S.timer.startAt)) / 1000)); const el = $('#h-el'); if (el) el.textContent = pad(Math.floor(s/3600)) + ':' + pad(Math.floor(s%3600/60)) + ':' + pad(s%60); };
+      upd(); tick = setInterval(upd, 1000);
+      $('#h-stop').onclick = stopTimer;
+    } else {
+      $('#h-timer').innerHTML = '';
+      $('#h-actions').innerHTML = `<button class="btn btn-primary" id="h-start">${ico('i-play')}${esc(t('startWork'))}</button>
+        <button class="btn btn-ghost" id="h-manual">${ico('i-edit')}${esc(t('manual'))}</button>`;
+      $('#h-start').onclick = () => { S.timer = { startAt: new Date().toISOString(), machineId: M().id }; save(); haptic('success'); toast(t('workStarted')); renderHome(); };
+      $('#h-manual').onclick = () => openEntry();
+    }
+  }
+  function stopTimer(){
+    const m = mById(S.timer.machineId) || M();
+    const st = new Date(S.timer.startAt), en = new Date();
+    const minutes = Math.round((en - st) / 60000);
+    if (minutes < 1) { S.timer = null; save(); toast(t('lessMin')); renderHome(); return; }
+    const norm = m.norm;
+    const s = { id: uid(), machineId: m.id, date: ymd(st), start: hhmm(st), end: hhmm(en), minutes, norm, liters: minutes/60*norm };
+    S.sessions.push(s); S.timer = null; save(); haptic('success'); showResult(s);
+  }
+
+  // ---------- entry ----------
+  let editingId = null;
+  function openEntry(id){
+    editingId = id || null;
+    const s = id ? S.sessions.find(x => x.id === id) : null;
+    $('#e-title').textContent = s ? t('edit') : t('workTime');
+    $('#e-date').value = s ? s.date : today();
+    $('#e-start').value = s ? s.start : '08:00';
+    $('#e-end').value = s ? s.end : hhmm(new Date());
+    $('#e-norm').value = s ? s.norm : M().norm;
+    $('#e-err').textContent = '';
+    go('entry');
+  }
+  $('#e-save').onclick = () => {
+    const err = k => { $('#e-err').textContent = t(k); haptic('error'); };
+    const date = $('#e-date').value, start = $('#e-start').value, end = $('#e-end').value, norm = num($('#e-norm').value);
+    if (!date) return err('errDate');
+    if (!start || !end) return err('errTimes');
+    if (start === end) return err('errSame');
+    if (!(norm > 0 && norm < 200)) return err('errNorm');
+    const minutes = minutesBetween(start, end);
+    const data = { date, start, end, minutes, norm, liters: minutes/60*norm };
+    let s;
+    if (editingId) { s = S.sessions.find(x => x.id === editingId); Object.assign(s, data); }
+    else { s = Object.assign({ id: uid(), machineId: M().id }, data); S.sessions.push(s); }
+    save(); haptic('success'); showResult(s);
+  };
+
+  // ---------- result ----------
+  let lastResult = null;
+  function showResult(s){ lastResult = s; go('result'); }
+  function renderResult(){
+    const s = lastResult; if (!s) return;
+    const m = mById(s.machineId) || M(), lvl = tankLevel(m);
+    $('#r-rows').innerHTML = `
+      <div class="row">${ico('i-clock')}<span class="lbl">${esc(t('workTime'))}</span><span class="val">${fmtDur(s.minutes)}<small>${s.start} – ${s.end} (${s.minutes} ${t('min')})</small></span></div>
+      <div class="row">${ico('i-fuel')}<span class="lbl">${esc(t('fuelUse'))}</span><span class="val">${fmtL(s.liters)} ${t('liters')}<small>${t('byNorm', { n: s.norm })}</small></span></div>
+      <div class="row">${ico('i-tank')}<span class="lbl">${esc(t('inTank'))}</span><span class="val">~${Math.round(lvl)} ${t('liters')}<small>${t('enoughFor', { d: fmtDur(lvl / m.norm * 60) })}</small></span></div>`;
+    $('#r-note').innerHTML = `${ico('i-info')}<div>${t('resultNote', { n: s.norm, d: fmtDur(s.minutes), l: fmtL(s.liters) })}</div>`;
+  }
+  $('#r-again').onclick = () => openEntry();
+
+  // ---------- history ----------
+  let filter = 'all';
+  $('#chips').addEventListener('click', e => { const c = e.target.closest('.chip'); if (!c) return; filter = c.dataset.f; $$('#chips .chip').forEach(x => x.classList.toggle('on', x === c)); renderHistory(); });
+  function renderHistory(){
+    const list = sorted().filter(s => inRange(s, filter));
+    const tot = sumFor(list);
+    $('#hist-totals').innerHTML = list.length ? `<span>${esc(t('total'))}: <b>${fmtDur(tot.min)}</b></span><span><b>${fmtL(tot.l)} ${t('liters')}</b></span>` : '';
+    if (!list.length) {
+      $('#hist-list').innerHTML = `<div class="empty"><p>${esc(t('emptyPeriod'))}</p><p>${esc(t('emptyHint'))}</p>
+        <button class="btn btn-primary" id="hist-add">${ico('i-plus')}${esc(t('addEntry'))}</button></div>`;
+      $('#hist-add').onclick = () => openEntry();
+      return;
+    }
+    $('#hist-list').innerHTML = list.map(s => `
+      <button class="item" data-id="${s.id}"><span class="main">
+        <div class="d">${fmtDate(s.date)}<span>${s.start} – ${s.end}</span></div>
+        <div class="m"><span><svg class="c-green"><use href="#i-clock"/></svg>${fmtDur(s.minutes)}</span><span><svg class="c-blue"><use href="#i-fuel"/></svg>${fmtL(s.liters)} ${t('liters')}</span></div>
+      </span>${ico('i-next')}</button>`).join('');
+    $$('#hist-list .item').forEach(b => b.onclick = () => openSession(b.dataset.id));
+  }
+  function openSession(id){
+    const s = S.sessions.find(x => x.id === id); if (!s) return;
+    openSheet(`<h3>${fmtDate(s.date)}</h3>
+      <div class="rows">
+        <div class="row">${ico('i-clock')}<span class="lbl">${esc(t('time'))}</span><span class="val">${s.start} – ${s.end}<small>${fmtDur(s.minutes)}</small></span></div>
+        <div class="row">${ico('i-fuel')}<span class="lbl">${esc(t('use'))}</span><span class="val">${fmtL(s.liters)} ${t('liters')}<small>${s.norm} ${t('lph')}</small></span></div>
+      </div>
+      <div class="btn-row"><button class="btn btn-danger" id="sh-del">${esc(t('del'))}</button><button class="btn btn-primary" id="sh-edit">${esc(t('edit'))}</button></div>`);
+    $('#sh-edit').onclick = () => { closeSheet(); openEntry(id); };
+    $('#sh-del').onclick = () => {
+      if ($('#sh-del').dataset.sure) { S.sessions = S.sessions.filter(x => x.id !== id); save(); closeSheet(); toast(t('deleted')); render(); }
+      else { $('#sh-del').dataset.sure = 1; $('#sh-del').textContent = t('confirm'); haptic('warning'); }
+    };
+  }
+
+  // ---------- tank ----------
+  function renderTank(){
+    const m = M(); if (!m) return;
+    const cap = m.cap, lvl = tankLevel(), pct = lvl/cap*100, low = pct <= m.low;
+    const f = $('#t-fuel'); f.style.height = Math.max(0, Math.min(100, pct)) + '%'; f.classList.toggle('low', low);
+    $('#t-liters').innerHTML = Math.round(lvl) + ' <small>/ ' + cap + ' ' + t('l') + '</small>';
+    $('#t-pct').innerHTML = `<b style="color:${low ? 'var(--orange)' : 'var(--green)'}">${esc(t('pctFull', { p: Math.round(pct) }))}</b>`;
+    $('#t-hours').innerHTML = t('approxHours', { d: fmtDur(lvl / m.norm * 60) });
+
+    const mine = ofM(S.sessions);
+    const days = [];
+    for (let i = 6; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); days.push(ymd(d)); }
+    const vals = days.map(d => sumFor(mine.filter(s => s.date === d)).l);
+    const max = Math.max(10, ...vals), W = 340, top = 18, base = 140, bw = 30, gap = (W - 7*bw) / 8;
+    let g = `<line x1="0" y1="${base}" x2="${W}" y2="${base}" stroke="var(--line)"/>`;
+    vals.forEach((v, i) => {
+      const x = gap + i*(bw+gap), h = v / max * (base - top), y = base - h, d = days[i], isToday = d === today();
+      g += `<rect x="${x}" y="${y}" width="${bw}" height="${Math.max(h, v ? 2 : 0)}" rx="6" fill="${isToday ? 'var(--blue)' : 'var(--blue-soft)'}" stroke="var(--blue)" stroke-opacity="${isToday ? 0 : .5}"/>`;
+      if (v) g += `<text x="${x + bw/2}" y="${y - 5}" text-anchor="middle" style="fill:var(--text);font-weight:700">${Math.round(v)}</text>`;
+      g += `<text x="${x + bw/2}" y="${base + 18}" text-anchor="middle">${d.slice(8)}.${d.slice(5,7)}</text>`;
+    });
+    $('#t-chart').innerHTML = g;
+
+    const mm = sumFor(mine.filter(s => inRange(s, 'month')));
+    const myFills = ofM(S.fills);
+    const filled = myFills.filter(x => x.type === 'fill' && inRange({ date: ymd(new Date(x.at)) }, 'month')).reduce((a,x) => a + x.liters, 0);
+    const workDays = new Set(mine.filter(s => inRange(s, 'month') && s.minutes > 0).map(s => s.date)).size;
+    $('#t-month').innerHTML = `
+      <div class="row">${ico('i-clock')}<span class="lbl">${esc(t('workedTime'))}</span><span class="val">${fmtDur(mm.min)}<small>${esc(t('workDays', { n: workDays }))}</small></span></div>
+      <div class="row">${ico('i-fuel')}<span class="lbl">${esc(t('spentL'))}</span><span class="val">${fmtL(mm.l)} ${t('liters')}</span></div>
+      <div class="row">${ico('i-drop')}<span class="lbl">${esc(t('filled'))}</span><span class="val">${fmtL(filled)} ${t('liters')}<small>${esc(t('fullNotCounted'))}</small></span></div>`;
+
+    const fl = myFills.slice().sort((a,b) => b.at.localeCompare(a.at)).slice(0, 15);
+    $('#t-fills').innerHTML = fl.length ? fl.map(x => {
+      const d = new Date(x.at), label = x.type === 'full' ? t('fullTank') : x.type === 'set' ? t('exactAmt', { l: Math.round(x.liters) }) : `+${fmtL(x.liters)} ${t('liters')}`;
+      return `<div class="fill-item"><div><b>${esc(label)}</b><small>${fmtDate(ymd(d))}, ${hhmm(d)}</small></div><button class="x" data-del="${x.id}" aria-label="${esc(t('del'))}">✕</button></div>`;
+    }).join('') : `<div class="empty" style="padding:18px"><p>${esc(t('noFills'))}</p></div>`;
+    $$('#t-fills [data-del]').forEach(b => b.onclick = () => { S.fills = S.fills.filter(x => x.id !== b.dataset.del); save(); toast(t('deleted')); renderTank(); });
+  }
+  $('#t-fill').onclick = () => {
+    const m = M();
+    askNumber({ title: t('howMuchFill'), value: '', unit: t('liters'),
+      quick: [{ t: t('fullTank'), v: 'full' }, { t: '50', v: 50 }, { t: '100', v: 100 }, { t: '150', v: 150 }],
+      onSave: v => {
+        const at = new Date().toISOString();
+        if (v === 'full') { S.fills.push({ id: uid(), machineId: m.id, at, type:'full', liters: 0 }); save(); haptic('success'); toast(t('tankFilled')); render(); return; }
+        const n = num(v); if (!(n > 0)) return t('enterLiters');
+        const before = tankLevel(m);
+        S.fills.push({ id: uid(), machineId: m.id, at, type:'fill', liters: n }); save(); haptic('success');
+        toast(before + n > m.cap ? t('overCap', { c: m.cap }) : t('added', { l: fmtL(n) }));
+        render();
+      }});
+  };
+  $('#t-set').onclick = () => {
+    const m = M();
+    askNumber({ title: t('exactQ'), value: Math.round(tankLevel(m)), unit: t('liters'),
+      extra: `<p class="muted" style="font-size:13.5px;margin:10px 0 0">${esc(t('exactHint'))}</p>`,
+      onSave: v => { const n = num(v); if (!(n >= 0) || n > m.cap) return t('range', { c: m.cap });
+        S.fills.push({ id: uid(), machineId: m.id, at: new Date().toISOString(), type:'set', liters: n }); save(); toast(t('leftUpdated')); render(); }});
+  };
+
+  // ---------- profile ----------
+  function renderProfile(){
+    const a = M();
+    $('#p-machines').innerHTML = S.machines.map(m => `
+      <button class="set-row" data-medit="${m.id}">${ico('i-tank')}<span class="t"><b>${esc(m.name)}${a && m.id === a.id ? `<span class="badge">${esc(t('active'))}</span>` : ''}</b>
+        <small>${esc(typeName(m.type))}${m.plate ? ' · ' + esc(m.plate) : ''} · ${esc(t('mSummary', { c: m.cap, n: m.norm }))}</small></span>${ico('i-next')}</button>`).join('') +
+      `<button class="set-row" id="p-add">${ico('i-plus')}<span class="t"><b>${esc(t('newMachine'))}</b></span>${ico('i-next')}</button>`;
+    $$('#p-machines [data-medit]').forEach(b => b.onclick = () => openMachine(b.dataset.medit));
+    $('#p-add').onclick = () => openMachine();
+    const u = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) || {};
+    $('#p-name').textContent = [PROFILE.first_name || u.first_name, PROFILE.last_name || u.last_name].filter(Boolean).join(' ') || 'WorkFuel';
+    $('#p-user').textContent = (PROFILE.username || u.username) ? '@' + (PROFILE.username || u.username) : '';
+    $('#p-phone').textContent = PROFILE.phone || '—';
+    $('#p-lang-v').textContent = LANG === 'ru' ? 'Русский' : "O'zbekcha";
+  }
+  $('#p-lang').onclick = () => {
+    openSheet(`<h3>${esc(t('language'))}</h3><div class="card list" style="margin-top:0">
+      <button class="set-row" data-lang="uz"><span class="t"><b>🇺🇿 O'zbekcha</b></span>${LANG === 'uz' ? ico('i-check') : ''}</button>
+      <button class="set-row" data-lang="ru"><span class="t"><b>🇷🇺 Русский</b></span>${LANG === 'ru' ? ico('i-check') : ''}</button></div>`);
+    $$('#sheet-body [data-lang]').forEach(b => b.onclick = () => {
+      const l = b.dataset.lang; closeSheet(); if (l === LANG) return;
+      LANG = l; PROFILE.lang = l; applyStatic(); render(); toast(t('langSaved'));
+      api('PUT', '/api/lang', { lang: l }).catch(() => {});
+    });
+  };
+
+  function render(){
+    if (current === 'home') renderHome();
+    if (current === 'history') renderHistory();
+    if (current === 'tank') renderTank();
+    if (current === 'profile') renderProfile();
+    if (current === 'result') renderResult();
+  }
+
+  // ---------- boot ----------
+  function gate(msgKey, btnKey, onBtn){
+    $('#g-msg').textContent = t(msgKey);
+    $('#g-btn').textContent = t(btnKey);
+    $('#g-btn').onclick = onBtn;
+    go('gate');
+  }
+  function normalize(s){
+    const b = blank();
+    if (!s || typeof s !== 'object') return b;
+    return Object.assign(b, s, { machines: s.machines || [], sessions: s.sessions || [], fills: s.fills || [] });
+  }
+  async function boot(){
+    const tu = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+    LANG = tu && /^ru/.test(tu.language_code || '') ? 'ru' : 'uz';
+    applyStatic();
+    go('loading');
+    if (!inTg && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
+      return gate('gateNoTg', 'retry', () => location.reload());
+    }
+    if (tu) CACHE_KEY = 'workfuel.v2.' + tu.id;
+    const cached = readCache();
+    let data;
+    try { data = await api('POST', '/api/me'); }
+    catch(e) {
+      if (e.status === 403) return gate('gateNoReg', 'close', () => tg ? tg.close() : location.reload());
+      if (e.status === 401 || !cached) return gate('gateErr', 'retry', () => location.reload());
+      data = null; // offline: fall back to the cached copy
+    }
+    if (data) {
+      PROFILE = data.profile || {};
+      if (PROFILE.lang) LANG = PROFILE.lang;
+      S = normalize(cached && cached.pending ? cached.S : data.state);
+      if (cached && cached.pending) { dirty = true; sync(); } else cache(false);
+    } else {
+      S = normalize(cached.S);
+      toast(t('offline'));
+    }
+    applyStatic();
+    if (!S.machines.length) openMachine(); else go('home');
+  }
+  boot();
+})();
+</script>
+</body>
+</html>

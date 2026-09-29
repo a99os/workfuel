@@ -196,6 +196,20 @@ nav.tabs button.on{color:var(--blue)}
 .sheet h3{margin:0 0 12px;font-size:18px}
 .quick{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .quick button{border:1px solid var(--line);background:var(--surface2);border-radius:12px;padding:10px 14px;font-weight:700}
+.modal{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:16px}
+.modal.open{display:flex;animation:fade .15s ease}
+.modal-card{width:100%;max-width:360px;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:22px 18px 18px;text-align:center;box-shadow:var(--shadow);animation:pop .18s ease}
+.modal-card .mo-ic{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;margin:0 auto 12px}
+.modal-card .mo-ic svg{width:28px;height:28px}
+.mo-ic.red{background:var(--red-soft);color:var(--red)}.mo-ic.blue{background:var(--blue-soft);color:var(--blue)}.mo-ic.orange{background:var(--orange-soft);color:var(--orange)}
+.modal-card h3{margin:0 0 8px;font-size:19px}
+.modal-card p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.5}
+.modal-card p b{color:var(--text)}
+.modal-card .btn-row{margin-top:8px}
+.btn-danger-solid{background:var(--red);color:#fff}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.modal.open,.modal-card{animation:none}}
 .toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;background:var(--text);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;font-size:14px;transition:.25s;z-index:20;pointer-events:none;max-width:90%;text-align:center}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .muted{color:var(--muted)}
@@ -444,6 +458,7 @@ nav.tabs button.on{color:var(--blue)}
 
 <div class="backdrop" id="backdrop"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="in"><div class="grab"></div><div id="sheet-body"></div></div></div>
+<div class="modal" id="modal"></div>
 <div class="toast" id="toast" role="status"></div>
 
 <script>
@@ -460,6 +475,9 @@ nav.tabs button.on{color:var(--blue)}
       pauseBtn:'Tushlik / pauza', resumeBtn:'Davom ettirish', onBreak:'Tushlikda, {t} dan beri', breakShort:'tushlik {d}',
       paused:'Pauza: tushlik', resumed:'Ish davom etmoqda', breakLabel:'Tushlik tanaffusi', noBreak:"Yo'q",
       errBreak:"Tanaffus ish vaqtidan qisqa bo'lishi kerak.",
+      stopQ:"Ishni to'xtatasizmi?", stopText:'Ishlangan vaqt: <b>{d}</b>, sarf: <b>{l} l</b>. Yozuv tarixga saqlanadi.',
+      stopShort:"Ish 1 daqiqadan kam, yozuv saqlanmaydi.", stopBtn:"To'xtatish", irreversible:"Buni qaytarib bo'lmaydi.",
+      delEntryQ:"Yozuvni o'chirasizmi?", delFillQ:"Salyarka yozuvini o'chirasizmi?", delFillHint:'Bakdagi qoldiq qayta hisoblanadi.',
       stopWork:"Ishni to'xtatish", startWork:'Yangi ish boshlash', manual:"Vaqtni qo'lda kiritish", viewHistory:"Tarixni ko'rish",
       workStarted:'Ish boshlandi', lessMin:"1 daqiqadan kam, yozilmadi", edit:'Tahrirlash', date:'Sana',
       startTime:'Ish boshlash vaqti', endTime:"Ish to'xtatish vaqti", normPerHour:"Soatiga yonilg'i (litr)", calcSave:'Hisoblash va saqlash',
@@ -503,6 +521,9 @@ nav.tabs button.on{color:var(--blue)}
       pauseBtn:'Обед / пауза', resumeBtn:'Продолжить', onBreak:'Обед с {t}', breakShort:'обед {d}',
       paused:'Пауза: обед', resumed:'Работа продолжается', breakLabel:'Обеденный перерыв', noBreak:'Нет',
       errBreak:'Перерыв должен быть короче времени работы.',
+      stopQ:'Остановить работу?', stopText:'Отработано: <b>{d}</b>, расход: <b>{l} л</b>. Запись сохранится в истории.',
+      stopShort:'Меньше 1 минуты, запись не сохранится.', stopBtn:'Остановить', irreversible:'Это действие нельзя отменить.',
+      delEntryQ:'Удалить запись?', delFillQ:'Удалить запись о заправке?', delFillHint:'Остаток в баке будет пересчитан.',
       stopWork:'Остановить работу', startWork:'Начать работу', manual:'Ввести время вручную', viewHistory:'История',
       workStarted:'Работа начата', lessMin:'Меньше 1 минуты, не записано', edit:'Редактировать', date:'Дата',
       startTime:'Начало работы', endTime:'Окончание работы', normPerHour:'Расход в час (литры)', calcSave:'Рассчитать и сохранить',
@@ -579,7 +600,10 @@ nav.tabs button.on{color:var(--blue)}
     try { tg.ready(); tg.expand(); if (tg.disableVerticalSwipes) tg.disableVerticalSwipes(); } catch(e) {}
     applyTheme(); tg.onEvent('themeChanged', applyTheme);
     if (inTg) document.body.classList.add('tg');
-    tg.BackButton.onClick(() => { if ($('#sheet').classList.contains('open')) closeSheet(); else back(); });
+    tg.BackButton.onClick(() => {
+      if ($('#modal').classList.contains('open')) $('#modal').classList.remove('open');
+      else if ($('#sheet').classList.contains('open')) closeSheet(); else back();
+    });
   }
 
   // ---------- state ----------
@@ -681,7 +705,23 @@ nav.tabs button.on{color:var(--blue)}
     if (tg && inTg && (current === 'home' || (current === 'machine' && !S.machines.length))) tg.BackButton.hide();
   }
   $('#backdrop').addEventListener('click', closeSheet);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+  document.addEventListener('keydown', e => { if (e.key !== 'Escape') return; if (modalOpen()) closeModal(); else closeSheet(); });
+
+  // Confirmation dialog for destructive / important actions. `text` is trusted HTML (callers escape user data).
+  const modalOpen = () => $('#modal').classList.contains('open');
+  function closeModal(){ $('#modal').classList.remove('open'); }
+  function confirmModal({ title, text = '', ok, icon = 'i-warn', tone = 'red', onOk }){
+    $('#modal').innerHTML = `<div class="modal-card" role="alertdialog" aria-modal="true" aria-labelledby="mo-t">
+      <div class="mo-ic ${tone}">${ico(icon)}</div><h3 id="mo-t">${esc(title)}</h3>${text ? `<p>${text}</p>` : ''}
+      <div class="btn-row"><button class="btn btn-ghost" id="mo-no">${esc(t('cancel'))}</button>
+      <button class="btn ${tone === 'red' ? 'btn-danger-solid' : 'btn-primary'}" id="mo-ok">${esc(ok)}</button></div></div>`;
+    $('#modal').classList.add('open');
+    haptic('warning');
+    $('#mo-no').onclick = closeModal;
+    $('#modal').onclick = e => { if (e.target.id === 'modal') closeModal(); };
+    $('#mo-ok').onclick = () => { closeModal(); onOk(); };
+    setTimeout(() => $('#mo-no').focus(), 50);
+  }
 
   function askNumber({ title, value, unit, quick = [], extra = '', onSave }){
     openSheet(`<h3>${esc(title)}</h3>
@@ -749,18 +789,15 @@ nav.tabs button.on{color:var(--blue)}
   };
   $('#m-del').onclick = () => {
     const m = mById(mEdit); if (!m) return;
-    openSheet(`<h3>${esc(t('delMachineQ', { n: m.name }))}</h3><p class="muted">${esc(t('delMachineHint'))}</p>
-      <div class="btn-row"><button class="btn btn-ghost" id="sh-no">${esc(t('cancel'))}</button><button class="btn btn-danger" id="sh-yes">${esc(t('del'))}</button></div>`);
-    $('#sh-no').onclick = closeSheet;
-    $('#sh-yes').onclick = () => {
+    confirmModal({ title: t('delMachineQ', { n: m.name }), text: esc(t('delMachineHint')), ok: t('del'), onOk: () => {
       S.machines = S.machines.filter(x => x.id !== m.id);
       S.sessions = S.sessions.filter(x => x.machineId !== m.id);
       S.fills = S.fills.filter(x => x.machineId !== m.id);
       if (S.timer && S.timer.machineId === m.id) S.timer = null;
       if (S.activeId === m.id) S.activeId = S.machines[0] ? S.machines[0].id : null;
-      save(); closeSheet(); toast(t('deleted'));
+      save(); toast(t('deleted'));
       if (!S.machines.length) openMachine(); else go('profile');
-    };
+    }});
   };
 
   function pickMachine(){
@@ -810,7 +847,12 @@ nav.tabs button.on{color:var(--blue)}
         else { tm.pauses.push({ from: new Date().toISOString() }); toast(t('paused')); }
         save(); haptic('success'); renderHome();
       };
-      $('#h-stop').onclick = stopTimer;
+      $('#h-stop').onclick = () => {
+        const now = Date.now(), min = Math.round((now - new Date(tm.startAt) - pausedMs(tm, now)) / 60000);
+        const norm = (mm || m).norm;
+        confirmModal({ title: t('stopQ'), icon: 'i-stop', ok: t('stopBtn'), onOk: stopTimer,
+          text: min < 1 ? esc(t('stopShort')) : t('stopText', { d: fmtDur(min), l: fmtL(min / 60 * norm) }) });
+      };
     } else {
       $('#h-timer').innerHTML = '';
       $('#h-actions').innerHTML = `<button class="btn btn-primary" id="h-start">${ico('i-play')}${esc(t('startWork'))}</button>
@@ -934,10 +976,11 @@ nav.tabs button.on{color:var(--blue)}
       </div>
       <div class="btn-row"><button class="btn btn-danger" id="sh-del">${esc(t('del'))}</button><button class="btn btn-primary" id="sh-edit">${esc(t('edit'))}</button></div>`);
     $('#sh-edit').onclick = () => { closeSheet(); openEntry(id); };
-    $('#sh-del').onclick = () => {
-      if ($('#sh-del').dataset.sure) { S.sessions = S.sessions.filter(x => x.id !== id); save(); closeSheet(); toast(t('deleted')); render(); }
-      else { $('#sh-del').dataset.sure = 1; $('#sh-del').textContent = t('confirm'); haptic('warning'); }
-    };
+    $('#sh-del').onclick = () => confirmModal({
+      title: t('delEntryQ'), ok: t('del'),
+      text: `<b>${fmtDate(s.date)}, ${esc(spanTxt(s))}</b><br>${fmtDur(s.minutes)} · ${fmtL(s.liters)} ${t('liters')}<br>${esc(t('irreversible'))}`,
+      onOk: () => { S.sessions = S.sessions.filter(x => x.id !== id); save(); closeSheet(); toast(t('deleted')); render(); }
+    });
   }
 
   // ---------- tank ----------
@@ -977,7 +1020,12 @@ nav.tabs button.on{color:var(--blue)}
       const d = new Date(x.at), label = x.type === 'full' ? t('fullTank') : x.type === 'set' ? t('exactAmt', { l: Math.round(x.liters) }) : `+${fmtL(x.liters)} ${t('liters')}`;
       return `<div class="fill-item"><div><b>${esc(label)}</b><small>${fmtDate(ymd(d))}, ${hhmm(d)}</small></div><button class="x" data-del="${x.id}" aria-label="${esc(t('del'))}">✕</button></div>`;
     }).join('') : `<div class="empty" style="padding:18px"><p>${esc(t('noFills'))}</p></div>`;
-    $$('#t-fills [data-del]').forEach(b => b.onclick = () => { S.fills = S.fills.filter(x => x.id !== b.dataset.del); save(); toast(t('deleted')); renderTank(); });
+    $$('#t-fills [data-del]').forEach(b => b.onclick = () => {
+      const row = b.closest('.fill-item');
+      confirmModal({ title: t('delFillQ'), ok: t('del'),
+        text: `<b>${esc(row.querySelector('b').textContent)}</b>, ${esc(row.querySelector('small').textContent)}<br>${esc(t('delFillHint'))}`,
+        onOk: () => { S.fills = S.fills.filter(x => x.id !== b.dataset.del); save(); toast(t('deleted')); renderTank(); } });
+    });
   }
   $('#t-fill').onclick = () => {
     const m = M();

@@ -106,7 +106,10 @@ body.tg .topbar .icon-btn[data-go]{visibility:hidden}
 .timer .pulse{width:12px;height:12px;border-radius:50%;background:var(--green);flex:none;animation:pulse 1.6s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.6)}100%{box-shadow:0 0 0 12px rgba(34,197,94,0)}}
 @media (prefers-reduced-motion:reduce){.timer .pulse{animation:none}}
+.timer.paused{background:var(--orange-soft);border-color:var(--orange)}
+.timer.paused .pulse{background:var(--orange);animation:none}
 .timer b{font-size:26px;font-variant-numeric:tabular-nums;display:block}
+.timer .brk{display:block;color:var(--orange);font-size:12.5px;font-weight:600;margin-top:2px}
 .timer small{color:var(--muted)}
 
 .alert{display:flex;gap:12px;align-items:center;background:var(--orange-soft);border:1px solid var(--orange);color:var(--text);border-radius:16px;padding:12px 14px;margin-top:12px;font-size:14px}
@@ -238,7 +241,9 @@ nav.tabs button.on{color:var(--blue)}
     <symbol id="i-tank" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 13h16" stroke="currentColor" stroke-width="2"/><path d="M9 3h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
     <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></symbol>
     <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
-    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-cup" viewBox="0 0 24 24"><path d="M4 9h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM17 10h1.5a2.5 2.5 0 0 1 0 5H17M8 3v3M12 3v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1.5" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1.5" fill="currentColor"/></symbol>
+    <symbol id="i-plus"viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
     <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M11 18h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
     <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
     <symbol id="i-tag" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 12h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -347,6 +352,11 @@ nav.tabs button.on{color:var(--blue)}
       <div class="field"><input type="time" id="e-end" value="17:00"></div>
     </div>
     <div class="card">
+      <div class="card-label"><span class="dot orange"><svg><use href="#i-cup"/></svg></span><span data-t="breakLabel"></span></div>
+      <div class="field md"><input type="text" inputmode="numeric" id="e-break" placeholder="0"><span data-t="min"></span></div>
+      <div class="quick" id="e-break-q"></div>
+    </div>
+    <div class="card">
       <div class="card-label"><span class="dot blue"><svg><use href="#i-fuel"/></svg></span><span data-t="normPerHour"></span></div>
       <div class="field"><input type="text" inputmode="decimal" id="e-norm"><span data-t="lph"></span></div>
     </div>
@@ -444,6 +454,12 @@ nav.tabs button.on{color:var(--blue)}
     uz: {
       appSub:"Ish va yonilg'i nazorati", todayWork:'Bugungi ish', workTime:'Ish vaqti', spent:'Sarflandi', inTank:'Bakda qoldi',
       lowAlert:"Bakda <b>{l} l</b> qoldi ({p}%). Salyarka quyish kerak.", runningSince:'Ish ketmoqda, {t} dan beri',
+      startWhen:'Ish qachon boshlandi?', startHint:"Hozirgi vaqt tanlangan. Oldinroq boshlagan bo'lsangiz, vaqtni o'zgartiring.",
+      now:'Hozir', agoMin:'{n} daq oldin', agoHour:'1 soat oldin', startBtn:'Boshlash',
+      errStartTime:"Vaqtni tanlang (kelajakdagi yoki 16 soatdan oldingi vaqt bo'lmaydi).", startedAt:'Ish {t} da boshlandi',
+      pauseBtn:'Tushlik / pauza', resumeBtn:'Davom ettirish', onBreak:'Tushlikda, {t} dan beri', breakShort:'tushlik {d}',
+      paused:'Pauza: tushlik', resumed:'Ish davom etmoqda', breakLabel:'Tushlik tanaffusi', noBreak:"Yo'q",
+      errBreak:"Tanaffus ish vaqtidan qisqa bo'lishi kerak.",
       stopWork:"Ishni to'xtatish", startWork:'Yangi ish boshlash', manual:"Vaqtni qo'lda kiritish", viewHistory:"Tarixni ko'rish",
       workStarted:'Ish boshlandi', lessMin:"1 daqiqadan kam, yozilmadi", edit:'Tahrirlash', date:'Sana',
       startTime:'Ish boshlash vaqti', endTime:"Ish to'xtatish vaqti", normPerHour:"Soatiga yonilg'i (litr)", calcSave:'Hisoblash va saqlash',
@@ -481,6 +497,12 @@ nav.tabs button.on{color:var(--blue)}
     ru: {
       appSub:'Учёт работы и топлива', todayWork:'Сегодня', workTime:'Время работы', spent:'Израсходовано', inTank:'В баке',
       lowAlert:'В баке осталось <b>{l} л</b> ({p}%). Пора заправиться.', runningSince:'Работа идёт с {t}',
+      startWhen:'Когда начали работу?', startHint:'Указано текущее время. Если начали раньше — измените его.',
+      now:'Сейчас', agoMin:'{n} мин назад', agoHour:'1 час назад', startBtn:'Начать',
+      errStartTime:'Выберите время (не в будущем и не раньше чем 16 часов назад).', startedAt:'Работа начата в {t}',
+      pauseBtn:'Обед / пауза', resumeBtn:'Продолжить', onBreak:'Обед с {t}', breakShort:'обед {d}',
+      paused:'Пауза: обед', resumed:'Работа продолжается', breakLabel:'Обеденный перерыв', noBreak:'Нет',
+      errBreak:'Перерыв должен быть короче времени работы.',
       stopWork:'Остановить работу', startWork:'Начать работу', manual:'Ввести время вручную', viewHistory:'История',
       workStarted:'Работа начата', lessMin:'Меньше 1 минуты, не записано', edit:'Редактировать', date:'Дата',
       startTime:'Начало работы', endTime:'Окончание работы', normPerHour:'Расход в час (литры)', calcSave:'Рассчитать и сохранить',
@@ -596,7 +618,7 @@ nav.tabs button.on{color:var(--blue)}
   // ---------- calculations ----------
   const minutesBetween = (a, b) => { const [ah,am] = a.split(':').map(Number), [bh,bm] = b.split(':').map(Number);
     let d = (bh*60+bm) - (ah*60+am); if (d <= 0) d += 1440; return d; };
-  const endOf = s => { const d = new Date(s.date + 'T' + s.start); d.setMinutes(d.getMinutes() + s.minutes); return d; };
+  const endOf = s => { const d = new Date(s.date + 'T' + s.start); d.setMinutes(d.getMinutes() + s.minutes + (s.breakMin || 0)); return d; };
   function tankLevel(m){
     m = m || M(); if (!m) return 0;
     const cap = m.cap;
@@ -768,30 +790,72 @@ nav.tabs button.on{color:var(--blue)}
 
     clearInterval(tick);
     if (S.timer) {
-      const tm = mById(S.timer.machineId);
-      const label = t('runningSince', { t: hhmm(new Date(S.timer.startAt)) }) + (tm && tm.id !== m.id ? ' · ' + tm.name : '');
-      $('#h-timer').innerHTML = `<div class="timer"><span class="pulse"></span><div style="flex:1"><small>${esc(label)}</small><b id="h-el">00:00:00</b></div></div>`;
-      $('#h-actions').innerHTML = `<button class="btn btn-danger" id="h-stop">${ico('i-stop')}${esc(t('stopWork'))}</button>`;
-      const upd = () => { const s = Math.max(0, Math.floor((Date.now() - new Date(S.timer.startAt)) / 1000)); const el = $('#h-el'); if (el) el.textContent = pad(Math.floor(s/3600)) + ':' + pad(Math.floor(s%3600/60)) + ':' + pad(s%60); };
+      const tm = S.timer, mm = mById(tm.machineId), paused = onBreak(tm);
+      const label = (paused ? t('onBreak', { t: hhmm(new Date(tm.pauses[tm.pauses.length - 1].from)) }) : t('runningSince', { t: hhmm(new Date(tm.startAt)) }))
+        + (mm && mm.id !== m.id ? ' · ' + mm.name : '');
+      $('#h-timer').innerHTML = `<div class="timer${paused ? ' paused' : ''}"><span class="pulse"></span><div style="flex:1"><small>${esc(label)}</small><b id="h-el">00:00:00</b><span class="brk" id="h-brk"></span></div></div>`;
+      $('#h-actions').innerHTML = `<div class="btn-row">
+        <button class="btn btn-ghost" id="h-pause">${ico(paused ? 'i-play' : 'i-cup')}${esc(t(paused ? 'resumeBtn' : 'pauseBtn'))}</button>
+        <button class="btn btn-danger" id="h-stop">${ico('i-stop')}${esc(t('stopWork'))}</button></div>`;
+      const upd = () => {
+        const now = Date.now(), brk = pausedMs(tm, now);
+        const s = Math.max(0, Math.floor((now - new Date(tm.startAt) - brk) / 1000));
+        const el = $('#h-el'); if (el) el.textContent = pad(Math.floor(s/3600)) + ':' + pad(Math.floor(s%3600/60)) + ':' + pad(s%60);
+        const b = $('#h-brk'); if (b) b.textContent = brk >= 60000 ? t('breakShort', { d: fmtDur(brk / 60000) }) : '';
+      };
       upd(); tick = setInterval(upd, 1000);
+      $('#h-pause').onclick = () => {
+        tm.pauses = tm.pauses || [];
+        if (onBreak(tm)) { tm.pauses[tm.pauses.length - 1].to = new Date().toISOString(); toast(t('resumed')); }
+        else { tm.pauses.push({ from: new Date().toISOString() }); toast(t('paused')); }
+        save(); haptic('success'); renderHome();
+      };
       $('#h-stop').onclick = stopTimer;
     } else {
       $('#h-timer').innerHTML = '';
       $('#h-actions').innerHTML = `<button class="btn btn-primary" id="h-start">${ico('i-play')}${esc(t('startWork'))}</button>
         <button class="btn btn-ghost" id="h-manual">${ico('i-edit')}${esc(t('manual'))}</button>`;
-      $('#h-start').onclick = () => { S.timer = { startAt: new Date().toISOString(), machineId: M().id }; save(); haptic('success'); toast(t('workStarted')); renderHome(); };
+      $('#h-start').onclick = askStart;
       $('#h-manual').onclick = () => openEntry();
     }
   }
+  const onBreak = tm => { const p = tm.pauses && tm.pauses[tm.pauses.length - 1]; return !!(p && !p.to); };
+  const pausedMs = (tm, now = Date.now()) => (tm.pauses || []).reduce((a, p) => a + Math.max(0, (p.to ? new Date(p.to) : now) - new Date(p.from)), 0);
+
+  function askStart(){
+    const now = new Date();
+    const ago = n => hhmm(new Date(now.getTime() - n * 60000));
+    openSheet(`<h3>${esc(t('startWhen'))}</h3>
+      <div class="field"><input type="time" id="sh-time" value="${hhmm(now)}"></div>
+      <div class="quick">${[[0, t('now')], [15, t('agoMin', { n: 15 })], [30, t('agoMin', { n: 30 })], [60, t('agoHour')]]
+        .map(([n, l]) => `<button data-ago="${n}">${esc(l)}</button>`).join('')}</div>
+      <p class="muted" style="font-size:13.5px;margin:10px 0 0">${esc(t('startHint'))}</p>
+      <div class="err" id="sh-err"></div>
+      <button class="btn btn-primary" id="sh-ok">${ico('i-play')}${esc(t('startBtn'))}</button>`);
+    $$('#sheet-body [data-ago]').forEach(b => b.onclick = () => { $('#sh-time').value = ago(+b.dataset.ago); });
+    $('#sh-ok').onclick = () => {
+      const v = $('#sh-time').value, cur = new Date();
+      if (!v) return void ($('#sh-err').textContent = t('errStartTime'));
+      const [h, mi] = v.split(':').map(Number);
+      const st = new Date(cur); st.setHours(h, mi, 0, 0);
+      if (st - cur > 60000) st.setDate(st.getDate() - 1); // e.g. 23:30 chosen after midnight = yesterday
+      if (cur - st > 16 * 3600000) { $('#sh-err').textContent = t('errStartTime'); haptic('error'); return; }
+      if (st > cur) st.setTime(cur.getTime());
+      S.timer = { startAt: st.toISOString(), machineId: M().id, pauses: [] };
+      save(); closeSheet(); haptic('success'); toast(t('startedAt', { t: hhmm(st) })); renderHome();
+    };
+  }
   function stopTimer(){
-    const m = mById(S.timer.machineId) || M();
-    const st = new Date(S.timer.startAt), en = new Date();
-    const minutes = Math.round((en - st) / 60000);
+    const tm = S.timer, m = mById(tm.machineId) || M();
+    const st = new Date(tm.startAt), en = new Date();
+    const breakMin = Math.round(pausedMs(tm, en.getTime()) / 60000);
+    const minutes = Math.round((en - st) / 60000) - breakMin;
     if (minutes < 1) { S.timer = null; save(); toast(t('lessMin')); renderHome(); return; }
     const norm = m.norm;
-    const s = { id: uid(), machineId: m.id, date: ymd(st), start: hhmm(st), end: hhmm(en), minutes, norm, liters: minutes/60*norm };
+    const s = { id: uid(), machineId: m.id, date: ymd(st), start: hhmm(st), end: hhmm(en), breakMin, minutes, norm, liters: minutes/60*norm };
     S.sessions.push(s); S.timer = null; save(); haptic('success'); showResult(s);
   }
+  const spanTxt = s => s.start + ' – ' + s.end + (s.breakMin ? ' · ' + t('breakShort', { d: fmtDur(s.breakMin) }) : '');
 
   // ---------- entry ----------
   let editingId = null;
@@ -803,18 +867,24 @@ nav.tabs button.on{color:var(--blue)}
     $('#e-start').value = s ? s.start : '08:00';
     $('#e-end').value = s ? s.end : hhmm(new Date());
     $('#e-norm').value = s ? s.norm : M().norm;
+    $('#e-break').value = s && s.breakMin ? s.breakMin : '';
+    $('#e-break-q').innerHTML = [[0, t('noBreak')], [30, '30'], [45, '45'], [60, '60'], [90, '90']].map(([v, l]) => `<button data-v="${v}">${esc(l)}</button>`).join('');
     $('#e-err').textContent = '';
     go('entry');
   }
+  $('#e-break-q').onclick = e => { const b = e.target.closest('[data-v]'); if (b) $('#e-break').value = +b.dataset.v ? b.dataset.v : ''; };
   $('#e-save').onclick = () => {
     const err = k => { $('#e-err').textContent = t(k); haptic('error'); };
     const date = $('#e-date').value, start = $('#e-start').value, end = $('#e-end').value, norm = num($('#e-norm').value);
+    const brkRaw = $('#e-break').value.trim(), breakMin = brkRaw === '' ? 0 : Math.round(num(brkRaw));
     if (!date) return err('errDate');
     if (!start || !end) return err('errTimes');
     if (start === end) return err('errSame');
+    if (!(breakMin >= 0)) return err('errBreak');
     if (!(norm > 0 && norm < 200)) return err('errNorm');
-    const minutes = minutesBetween(start, end);
-    const data = { date, start, end, minutes, norm, liters: minutes/60*norm };
+    const minutes = minutesBetween(start, end) - breakMin;
+    if (minutes < 1) return err('errBreak');
+    const data = { date, start, end, breakMin, minutes, norm, liters: minutes/60*norm };
     let s;
     if (editingId) { s = S.sessions.find(x => x.id === editingId); Object.assign(s, data); }
     else { s = Object.assign({ id: uid(), machineId: M().id }, data); S.sessions.push(s); }
@@ -828,7 +898,7 @@ nav.tabs button.on{color:var(--blue)}
     const s = lastResult; if (!s) return;
     const m = mById(s.machineId) || M(), lvl = tankLevel(m);
     $('#r-rows').innerHTML = `
-      <div class="row">${ico('i-clock')}<span class="lbl">${esc(t('workTime'))}</span><span class="val">${fmtDur(s.minutes)}<small>${s.start} – ${s.end} (${s.minutes} ${t('min')})</small></span></div>
+      <div class="row">${ico('i-clock')}<span class="lbl">${esc(t('workTime'))}</span><span class="val">${fmtDur(s.minutes)}<small>${esc(spanTxt(s))}</small></span></div>
       <div class="row">${ico('i-fuel')}<span class="lbl">${esc(t('fuelUse'))}</span><span class="val">${fmtL(s.liters)} ${t('liters')}<small>${t('byNorm', { n: s.norm })}</small></span></div>
       <div class="row">${ico('i-tank')}<span class="lbl">${esc(t('inTank'))}</span><span class="val">~${Math.round(lvl)} ${t('liters')}<small>${t('enoughFor', { d: fmtDur(lvl / m.norm * 60) })}</small></span></div>`;
     $('#r-note').innerHTML = `${ico('i-info')}<div>${t('resultNote', { n: s.norm, d: fmtDur(s.minutes), l: fmtL(s.liters) })}</div>`;
@@ -850,7 +920,7 @@ nav.tabs button.on{color:var(--blue)}
     }
     $('#hist-list').innerHTML = list.map(s => `
       <button class="item" data-id="${s.id}"><span class="main">
-        <div class="d">${fmtDate(s.date)}<span>${s.start} – ${s.end}</span></div>
+        <div class="d">${fmtDate(s.date)}<span>${esc(spanTxt(s))}</span></div>
         <div class="m"><span><svg class="c-green"><use href="#i-clock"/></svg>${fmtDur(s.minutes)}</span><span><svg class="c-blue"><use href="#i-fuel"/></svg>${fmtL(s.liters)} ${t('liters')}</span></div>
       </span>${ico('i-next')}</button>`).join('');
     $$('#hist-list .item').forEach(b => b.onclick = () => openSession(b.dataset.id));
@@ -859,7 +929,7 @@ nav.tabs button.on{color:var(--blue)}
     const s = S.sessions.find(x => x.id === id); if (!s) return;
     openSheet(`<h3>${fmtDate(s.date)}</h3>
       <div class="rows">
-        <div class="row">${ico('i-clock')}<span class="lbl">${esc(t('time'))}</span><span class="val">${s.start} – ${s.end}<small>${fmtDur(s.minutes)}</small></span></div>
+        <div class="row">${ico('i-clock')}<span class="lbl">${esc(t('time'))}</span><span class="val">${s.start} – ${s.end}<small>${fmtDur(s.minutes)}${s.breakMin ? ' · ' + esc(t('breakShort', { d: fmtDur(s.breakMin) })) : ''}</small></span></div>
         <div class="row">${ico('i-fuel')}<span class="lbl">${esc(t('use'))}</span><span class="val">${fmtL(s.liters)} ${t('liters')}<small>${s.norm} ${t('lph')}</small></span></div>
       </div>
       <div class="btn-row"><button class="btn btn-danger" id="sh-del">${esc(t('del'))}</button><button class="btn btn-primary" id="sh-edit">${esc(t('edit'))}</button></div>`);

@@ -4,6 +4,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildReport, isYmd, MAX_DAYS } from './report.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -201,6 +202,23 @@ async function poll() {
   }
 }
 
+const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+async function sendDocument(chatId, buffer, filename, caption) {
+  try {
+    const fd = new FormData();
+    fd.append('chat_id', String(chatId));
+    fd.append('caption', caption);
+    fd.append('document', new Blob([buffer], { type: XLSX_MIME }), filename);
+    const r = await fetch(`https://api.telegram.org/bot${TOKEN}/sendDocument`, { method: 'POST', body: fd });
+    const j = await r.json();
+    if (!j.ok) console.error('[tg] sendDocument:', j.description);
+    return j.ok;
+  } catch (e) {
+    console.error('[tg] sendDocument:', e.message);
+    return false;
+  }
+}
+
 // ---------- Mini App auth (initData HMAC check) ----------
 const WEBAPP_SECRET = crypto.createHmac('sha256', 'WebAppData').update(TOKEN).digest();
 const MAX_AGE_S = 7 * 24 * 3600;
@@ -266,6 +284,22 @@ async function api(req, res, route) {
     updateUser(tgUser.id, x => { x.profile.lang = lang; });
     if (u.profile.lang !== lang) sendApp(tgUser.id, lang);
     return send(res, 200, { ok: true });
+  }
+  if (route === 'POST /api/export') {
+    const { machineId, from, to, tz, deliver } = await readBody(req);
+    if (!isYmd(from) || !isYmd(to) || from > to) return send(res, 400, { error: 'bad_range' });
+    if ((Date.parse(to) - Date.parse(from)) / 86400000 >= MAX_DAYS) return send(res, 400, { error: 'range_too_long' });
+    const state = u.state;
+    const machine = validState(state) && state.machines.find(m => m.id === machineId);
+    if (!machine) return send(res, 404, { error: 'no_machine' });
+    const offset = Number.isFinite(tz) && Math.abs(tz) <= 840 ? tz : 0;
+    const rep = buildReport({ state, machine, from, to, tz: offset, lang: u.profile.lang });
+    if (deliver === 'download') {
+      res.writeHead(200, { 'content-type': XLSX_MIME, 'content-disposition': `attachment; filename="${rep.filename}"`, 'cache-control': 'no-store' });
+      return res.end(rep.buffer);
+    }
+    const ok = await sendDocument(tgUser.id, rep.buffer, rep.filename, rep.caption);
+    return send(res, ok ? 200 : 502, { ok });
   }
   return send(res, 404, { error: 'not_found' });
 }

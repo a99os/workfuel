@@ -168,6 +168,29 @@ body.tg .topbar .icon-btn[data-go]{visibility:hidden}
 .fill-item small{color:var(--muted);display:block;font-size:12.5px}
 .fill-item .x{border:0;background:transparent;color:var(--muted);padding:6px}
 
+/* statistics */
+.range{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.range label{font-size:12.5px;color:var(--muted);font-weight:600}
+.range .field{margin-top:4px;padding:2px 10px}
+.range .field input{font-size:15px;font-weight:600;padding:8px 0;letter-spacing:0}
+.period-lbl{margin-top:12px;color:var(--muted);font-size:13.5px}
+.period-lbl b{color:var(--text)}
+.chart-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.seg{display:flex;background:var(--surface2);border-radius:10px;padding:3px;flex:none}
+.seg button{border:0;background:transparent;border-radius:8px;padding:6px 12px;font-weight:700;font-size:13px;color:var(--muted)}
+.seg button.on{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.day-row{display:flex;align-items:center;gap:12px;padding:10px 0}
+.day-row+.day-row{border-top:1px solid var(--line)}
+.dr-d{width:50px;flex:none}
+.dr-d b{display:block;font-size:14.5px}
+.dr-d small{color:var(--muted);font-size:12px}
+.dr-m{flex:1;min-width:0}
+.dr-m small{display:block;color:var(--muted);font-size:12.5px;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar{height:8px;border-radius:6px;background:var(--surface2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--blue);border-radius:6px}
+.dr-h{flex:none;font-size:15px;text-align:right;min-width:76px}
+.more{border:0;background:transparent;color:var(--blue);font-weight:700;padding:12px 0 4px;width:100%}
+
 /* settings */
 .set-row{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;background:transparent;padding:14px 0}
 .set-row+.set-row{border-top:1px solid var(--line)}
@@ -257,7 +280,8 @@ nav.tabs button.on{color:var(--blue)}
     <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
     <symbol id="i-cup" viewBox="0 0 24 24"><path d="M4 9h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM17 10h1.5a2.5 2.5 0 0 1 0 5H17M8 3v3M12 3v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1.5" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1.5" fill="currentColor"/></symbol>
-    <symbol id="i-plus"viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-sheet" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 9h16M4 15h16M10 9v12" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
     <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M11 18h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
     <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
     <symbol id="i-tag" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 12h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
@@ -421,10 +445,31 @@ nav.tabs button.on{color:var(--blue)}
       <button class="btn btn-green" id="t-fill"><svg><use href="#i-fuel"/></svg><span data-t="fillBtn"></span></button>
       <button class="btn btn-ghost" id="t-set"><svg><use href="#i-edit"/></svg><span data-t="exactBtn"></span></button>
     </div>
-    <div class="section-title" data-t="last7"></div>
-    <div class="card"><svg class="chart" id="t-chart" viewBox="0 0 340 170"></svg></div>
-    <div class="section-title" data-t="byMonth"></div>
-    <div class="card rows" id="t-month"></div>
+    <div class="section-title" data-t="stats"></div>
+    <div class="card">
+      <div class="chips" id="st-chips">
+        <button class="chip on" data-p="7d" data-t="p7"></button>
+        <button class="chip" data-p="30d" data-t="p30"></button>
+        <button class="chip" data-p="month" data-t="pMonth"></button>
+        <button class="chip" data-p="prev" data-t="pPrev"></button>
+        <button class="chip" data-p="custom" data-t="pCustom"></button>
+      </div>
+      <div class="range" id="st-range" hidden>
+        <label><span data-t="from"></span><div class="field"><input type="date" id="st-from"></div></label>
+        <label><span data-t="to"></span><div class="field"><input type="date" id="st-to"></div></label>
+      </div>
+      <div class="period-lbl" id="st-label"></div>
+    </div>
+    <div class="card rows" id="t-stats"></div>
+    <button class="btn btn-primary" id="t-export"><svg><use href="#i-sheet"/></svg><span data-t="exportBtn"></span></button>
+    <div class="card">
+      <div class="chart-head"><b id="st-chart-t"></b>
+        <div class="seg" id="st-metric"><button data-m="h" class="on" data-t="metricH"></button><button data-m="l" data-t="metricL"></button></div>
+      </div>
+      <svg class="chart" id="t-chart" viewBox="0 0 340 170"></svg>
+    </div>
+    <div class="section-title" data-t="dailyHours"></div>
+    <div class="card" id="t-days"></div>
     <div class="section-title" data-t="filledFuel"></div>
     <div class="card" id="t-fills"></div>
   </section>
@@ -477,6 +522,14 @@ nav.tabs button.on{color:var(--blue)}
       errBreak:"Tanaffus ish vaqtidan qisqa bo'lishi kerak.",
       stopQ:"Ishni to'xtatasizmi?", stopText:'Ishlangan vaqt: <b>{d}</b>, sarf: <b>{l} l</b>. Yozuv tarixga saqlanadi.',
       stopShort:"Ish 1 daqiqadan kam, yozuv saqlanmaydi.", stopBtn:"To'xtatish", irreversible:"Buni qaytarib bo'lmaydi.",
+      stats:'Statistika', p7:'7 kun', p30:'30 kun', pMonth:'Bu oy', pPrev:"O'tgan oy", pCustom:'Tanlash…', from:'Dan', to:'Gacha',
+      periodDays:'{n} kun', avgDay:"O'rtacha kunlik ish", maxDay:"eng ko'p: {d}", avgFuelDay:"o'rtacha {l} l/kun",
+      metricH:'Soat', metricL:'Litr', binDay:"Kunlar bo'yicha", binWeek:"Haftalar bo'yicha", binMonth:"Oylar bo'yicha", avgShort:"o'rt.",
+      dailyHours:'Kunlik ish soatlari', noWork:"Bu davrda ish yozuvi yo'q.", showAll:"Hammasini ko'rsatish ({n})",
+      exportBtn:"Excel'ga yuklab olish", exporting:'Tayyorlanmoqda…', exportSentT:'Fayl yuborildi',
+      exportSent:'Excel hisobot bot chatiga yuborildi. Chatni ochib, faylni yuklab oling.', openChat:"Chatga o'tish",
+      exportErr:"Faylni tayyorlab bo'lmadi. Internetni tekshirib, qayta urinib ko'ring.", errRange:'Davr 400 kundan oshmasin.',
+      wd:['Yak','Du','Se','Chor','Pay','Ju','Sha'],
       delEntryQ:"Yozuvni o'chirasizmi?", delFillQ:"Salyarka yozuvini o'chirasizmi?", delFillHint:'Bakdagi qoldiq qayta hisoblanadi.',
       stopWork:"Ishni to'xtatish", startWork:'Yangi ish boshlash', manual:"Vaqtni qo'lda kiritish", viewHistory:"Tarixni ko'rish",
       workStarted:'Ish boshlandi', lessMin:"1 daqiqadan kam, yozilmadi", edit:'Tahrirlash', date:'Sana',
@@ -523,6 +576,14 @@ nav.tabs button.on{color:var(--blue)}
       errBreak:'Перерыв должен быть короче времени работы.',
       stopQ:'Остановить работу?', stopText:'Отработано: <b>{d}</b>, расход: <b>{l} л</b>. Запись сохранится в истории.',
       stopShort:'Меньше 1 минуты, запись не сохранится.', stopBtn:'Остановить', irreversible:'Это действие нельзя отменить.',
+      stats:'Статистика', p7:'7 дней', p30:'30 дней', pMonth:'Этот месяц', pPrev:'Прошлый месяц', pCustom:'Выбрать…', from:'С', to:'По',
+      periodDays:'{n} дн.', avgDay:'В среднем за день', maxDay:'максимум: {d}', avgFuelDay:'в среднем {l} л/день',
+      metricH:'Часы', metricL:'Литры', binDay:'По дням', binWeek:'По неделям', binMonth:'По месяцам', avgShort:'ср.',
+      dailyHours:'Часы работы по дням', noWork:'За период нет записей работы.', showAll:'Показать все ({n})',
+      exportBtn:'Скачать в Excel', exporting:'Готовим файл…', exportSentT:'Файл отправлен',
+      exportSent:'Отчёт Excel отправлен в чат с ботом. Откройте чат и скачайте файл.', openChat:'Открыть чат',
+      exportErr:'Не удалось подготовить файл. Проверьте интернет и попробуйте снова.', errRange:'Период — не более 400 дней.',
+      wd:['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],
       delEntryQ:'Удалить запись?', delFillQ:'Удалить запись о заправке?', delFillHint:'Остаток в баке будет пересчитан.',
       stopWork:'Остановить работу', startWork:'Начать работу', manual:'Ввести время вручную', viewHistory:'История',
       workStarted:'Работа начата', lessMin:'Меньше 1 минуты, не записано', edit:'Редактировать', date:'Дата',
@@ -710,13 +771,13 @@ nav.tabs button.on{color:var(--blue)}
   // Confirmation dialog for destructive / important actions. `text` is trusted HTML (callers escape user data).
   const modalOpen = () => $('#modal').classList.contains('open');
   function closeModal(){ $('#modal').classList.remove('open'); }
-  function confirmModal({ title, text = '', ok, icon = 'i-warn', tone = 'red', onOk }){
+  function confirmModal({ title, text = '', ok, cancel, icon = 'i-warn', tone = 'red', onOk }){
     $('#modal').innerHTML = `<div class="modal-card" role="alertdialog" aria-modal="true" aria-labelledby="mo-t">
       <div class="mo-ic ${tone}">${ico(icon)}</div><h3 id="mo-t">${esc(title)}</h3>${text ? `<p>${text}</p>` : ''}
-      <div class="btn-row"><button class="btn btn-ghost" id="mo-no">${esc(t('cancel'))}</button>
+      <div class="btn-row"><button class="btn btn-ghost" id="mo-no">${esc(cancel || t('cancel'))}</button>
       <button class="btn ${tone === 'red' ? 'btn-danger-solid' : 'btn-primary'}" id="mo-ok">${esc(ok)}</button></div></div>`;
     $('#modal').classList.add('open');
-    haptic('warning');
+    haptic(tone === 'red' ? 'warning' : 'success');
     $('#mo-no').onclick = closeModal;
     $('#modal').onclick = e => { if (e.target.id === 'modal') closeModal(); };
     $('#mo-ok').onclick = () => { closeModal(); onOk(); };
@@ -992,30 +1053,78 @@ nav.tabs button.on{color:var(--blue)}
     $('#t-pct').innerHTML = `<b style="color:${low ? 'var(--orange)' : 'var(--green)'}">${esc(t('pctFull', { p: Math.round(pct) }))}</b>`;
     $('#t-hours').innerHTML = t('approxHours', { d: fmtDur(lvl / m.norm * 60) });
 
-    const mine = ofM(S.sessions);
-    const days = [];
-    for (let i = 6; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); days.push(ymd(d)); }
-    const vals = days.map(d => sumFor(mine.filter(s => s.date === d)).l);
-    const max = Math.max(10, ...vals), W = 340, top = 18, base = 140, bw = 30, gap = (W - 7*bw) / 8;
-    let g = `<line x1="0" y1="${base}" x2="${W}" y2="${base}" stroke="var(--line)"/>`;
-    vals.forEach((v, i) => {
-      const x = gap + i*(bw+gap), h = v / max * (base - top), y = base - h, d = days[i], isToday = d === today();
-      g += `<rect x="${x}" y="${y}" width="${bw}" height="${Math.max(h, v ? 2 : 0)}" rx="6" fill="${isToday ? 'var(--blue)' : 'var(--blue-soft)'}" stroke="var(--blue)" stroke-opacity="${isToday ? 0 : .5}"/>`;
-      if (v) g += `<text x="${x + bw/2}" y="${y - 5}" text-anchor="middle" style="fill:var(--text);font-weight:700">${Math.round(v)}</text>`;
-      g += `<text x="${x + bw/2}" y="${base + 18}" text-anchor="middle">${d.slice(8)}.${d.slice(5,7)}</text>`;
-    });
-    $('#t-chart').innerHTML = g;
+    renderStats();
+  }
 
-    const mm = sumFor(mine.filter(s => inRange(s, 'month')));
-    const myFills = ofM(S.fills);
-    const filled = myFills.filter(x => x.type === 'fill' && inRange({ date: ymd(new Date(x.at)) }, 'month')).reduce((a,x) => a + x.liters, 0);
-    const workDays = new Set(mine.filter(s => inRange(s, 'month') && s.minutes > 0).map(s => s.date)).size;
-    $('#t-month').innerHTML = `
-      <div class="row">${ico('i-clock')}<span class="lbl">${esc(t('workedTime'))}</span><span class="val">${fmtDur(mm.min)}<small>${esc(t('workDays', { n: workDays }))}</small></span></div>
-      <div class="row">${ico('i-fuel')}<span class="lbl">${esc(t('spentL'))}</span><span class="val">${fmtL(mm.l)} ${t('liters')}</span></div>
+  // ---------- statistics (selectable period) ----------
+  const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+  const parseYmd = s => { const [y, mo, d] = s.split('-').map(Number); return new Date(y, mo - 1, d); };
+  const MAX_DAYS = 400;
+  const dayList = (from, to) => { const out = []; for (let d = parseYmd(from), i = 0; ymd(d) <= to && i < MAX_DAYS; d = addDays(d, 1), i++) out.push(ymd(d)); return out; };
+  const STP = { p: '7d', from: null, to: null, metric: 'h', showAll: false };
+  function period(){
+    const now = new Date(), td = today();
+    if (STP.p === '30d') return { from: ymd(addDays(now, -29)), to: td };
+    if (STP.p === 'month') return { from: ymd(new Date(now.getFullYear(), now.getMonth(), 1)), to: td };
+    if (STP.p === 'prev') return { from: ymd(new Date(now.getFullYear(), now.getMonth() - 1, 1)), to: ymd(new Date(now.getFullYear(), now.getMonth(), 0)) };
+    if (STP.p === 'custom' && STP.from && STP.to) return { from: STP.from, to: STP.to };
+    return { from: ymd(addDays(now, -6)), to: td };
+  }
+  $('#st-chips').addEventListener('click', e => {
+    const c = e.target.closest('[data-p]'); if (!c) return;
+    if (c.dataset.p === 'custom' && STP.p !== 'custom') { const cur = period(); STP.from = cur.from; STP.to = cur.to; }
+    STP.p = c.dataset.p; STP.showAll = false; renderStats();
+  });
+  const onRange = () => {
+    let f = $('#st-from').value, e = $('#st-to').value; if (!f || !e) return;
+    if (f > e) [f, e] = [e, f];
+    if ((parseYmd(e) - parseYmd(f)) / 864e5 >= MAX_DAYS) { toast(t('errRange')); f = ymd(addDays(parseYmd(e), -(MAX_DAYS - 1))); }
+    STP.from = f; STP.to = e; STP.showAll = false; renderStats();
+  };
+  $('#st-from').onchange = onRange; $('#st-to').onchange = onRange;
+  $('#st-metric').onclick = e => { const b = e.target.closest('[data-m]'); if (!b) return; STP.metric = b.dataset.m; renderStats(); };
+
+  function renderStats(){
+    const m = M(); if (!m) return;
+    const { from, to } = period(), days = dayList(from, to), td = today();
+    $$('#st-chips [data-p]').forEach(c => c.classList.toggle('on', c.dataset.p === STP.p));
+    $$('#st-metric [data-m]').forEach(b => b.classList.toggle('on', b.dataset.m === STP.metric));
+    $('#st-range').hidden = STP.p !== 'custom';
+    $('#st-from').value = from; $('#st-to').value = to; $('#st-from').max = td; $('#st-to').max = td;
+    $('#st-label').innerHTML = `<b>${fmtDate(from)} – ${fmtDate(to)}</b> · ${esc(t('periodDays', { n: days.length }))}`;
+
+    const mine = ofM(S.sessions).filter(s => s.date >= from && s.date <= to);
+    const per = new Map(days.map(d => [d, { min: 0, l: 0, brk: 0, list: [] }]));
+    for (const s of mine) { const x = per.get(s.date); if (!x) continue; x.min += s.minutes; x.l += s.liters; x.brk += s.breakMin || 0; x.list.push(s); }
+    const worked = days.filter(d => per.get(d).min > 0);
+    const tot = sumFor(mine);
+    const avgMin = worked.length ? tot.min / worked.length : 0;
+    const maxMin = Math.max(0, ...days.map(d => per.get(d).min));
+    const fillsIn = ofM(S.fills).filter(f => { const d = ymd(new Date(f.at)); return d >= from && d <= to; });
+    const filled = fillsIn.filter(x => x.type === 'fill').reduce((a, x) => a + x.liters, 0);
+    $('#t-stats').innerHTML = `
+      <div class="row">${ico('i-clock')}<span class="lbl">${esc(t('workedTime'))}</span><span class="val">${fmtDur(tot.min)}<small>${esc(t('workDays', { n: worked.length }))}</small></span></div>
+      <div class="row">${ico('i-play')}<span class="lbl">${esc(t('avgDay'))}</span><span class="val">${fmtDur(avgMin)}<small>${esc(t('maxDay', { d: fmtDur(maxMin) }))}</small></span></div>
+      <div class="row">${ico('i-fuel')}<span class="lbl">${esc(t('spentL'))}</span><span class="val">${fmtL(tot.l)} ${t('liters')}<small>${esc(t('avgFuelDay', { l: fmtL(worked.length ? tot.l / worked.length : 0) }))}</small></span></div>
       <div class="row">${ico('i-drop')}<span class="lbl">${esc(t('filled'))}</span><span class="val">${fmtL(filled)} ${t('liters')}<small>${esc(t('fullNotCounted'))}</small></span></div>`;
 
-    const fl = myFills.slice().sort((a,b) => b.at.localeCompare(a.at)).slice(0, 15);
+    renderChart(days, per);
+
+    // Per-day hours list (newest first).
+    const wd = I18N[LANG].wd, list = worked.slice().reverse(), shown = STP.showAll ? list : list.slice(0, 14);
+    $('#t-days').innerHTML = list.length ? shown.map(d => {
+      const x = per.get(d), ss = x.list.slice().sort((a, b) => a.start.localeCompare(b.start));
+      const extra = [ss[0].start + '–' + ss[ss.length - 1].end, fmtL(x.l) + ' ' + t('l')];
+      if (x.brk) extra.push(t('breakShort', { d: fmtDur(x.brk) }));
+      return `<div class="day-row"><div class="dr-d"><b>${d.slice(8)}.${d.slice(5, 7)}</b><small>${esc(wd[parseYmd(d).getDay()])}</small></div>
+        <div class="dr-m"><div class="bar"><i style="width:${Math.max(3, x.min / Math.max(maxMin, 1) * 100)}%"></i></div><small>${esc(extra.join(' · '))}</small></div>
+        <b class="dr-h">${fmtDur(x.min)}</b></div>`;
+    }).join('') + (list.length > shown.length ? `<button class="more" id="st-more">${esc(t('showAll', { n: list.length }))}</button>` : '')
+      : `<div class="empty" style="padding:18px"><p>${esc(t('noWork'))}</p></div>`;
+    const more = $('#st-more'); if (more) more.onclick = () => { STP.showAll = true; renderStats(); };
+
+    // Refuels within the period.
+    const fl = fillsIn.slice().sort((a,b) => b.at.localeCompare(a.at));
     $('#t-fills').innerHTML = fl.length ? fl.map(x => {
       const d = new Date(x.at), label = x.type === 'full' ? t('fullTank') : x.type === 'set' ? t('exactAmt', { l: Math.round(x.liters) }) : `+${fmtL(x.liters)} ${t('liters')}`;
       return `<div class="fill-item"><div><b>${esc(label)}</b><small>${fmtDate(ymd(d))}, ${hhmm(d)}</small></div><button class="x" data-del="${x.id}" aria-label="${esc(t('del'))}">✕</button></div>`;
@@ -1027,6 +1136,67 @@ nav.tabs button.on{color:var(--blue)}
         onOk: () => { S.fills = S.fills.filter(x => x.id !== b.dataset.del); save(); toast(t('deleted')); renderTank(); } });
     });
   }
+
+  function renderChart(days, per){
+    const hours = STP.metric === 'h', n0 = days.length;
+    let bins, kind;
+    if (n0 <= 31) { kind = 'binDay'; bins = days.map(d => ({ label: d.slice(8) + '.' + d.slice(5, 7), days: [d] })); }
+    else if (n0 <= 182) { kind = 'binWeek'; bins = []; for (let i = 0; i < n0; i += 7) { const ds = days.slice(i, i + 7); bins.push({ label: ds[0].slice(8) + '.' + ds[0].slice(5, 7), days: ds }); } }
+    else {
+      kind = 'binMonth'; const mp = new Map();
+      for (const d of days) { const k = d.slice(0, 7); if (!mp.has(k)) mp.set(k, { label: d.slice(5, 7) + '.' + d.slice(2, 4), days: [] }); mp.get(k).days.push(d); }
+      bins = [...mp.values()];
+    }
+    $('#st-chart-t').textContent = t(kind) + ', ' + (hours ? t('hour') : t('l'));
+    const fmtV = v => hours ? String(Math.round(v * 10) / 10) : String(Math.round(v));
+    const vals = bins.map(b => b.days.reduce((a, d) => a + (hours ? per.get(d).min / 60 : per.get(d).l), 0));
+    const n = bins.length, W = 340, top = 22, base = 140, slot = W / n, bw = Math.min(30, slot * 0.7);
+    const max = Math.max(hours ? 8 : 10, ...vals) * 1.08, td = today();
+    let g = `<line x1="0" y1="${base}" x2="${W}" y2="${base}" stroke="var(--line)"/>`;
+    const step = Math.ceil(n / 8);
+    vals.forEach((v, i) => {
+      const x = i * slot + (slot - bw) / 2, h = v / max * (base - top), y = base - h, cur = bins[i].days.includes(td);
+      g += `<rect x="${x}" y="${y}" width="${bw}" height="${Math.max(h, v ? 2 : 0)}" rx="${Math.min(6, bw / 3)}" fill="${cur ? 'var(--blue)' : 'var(--blue-soft)'}" stroke="var(--blue)" stroke-opacity="${cur ? 0 : .5}"/>`;
+      if (v && n <= 16) g += `<text x="${x + bw / 2}" y="${y - 5}" text-anchor="middle" style="fill:var(--text);font-weight:700">${fmtV(v)}</text>`;
+      if (i % step === 0) g += `<text x="${x + bw / 2}" y="${base + 18}" text-anchor="middle">${bins[i].label}</text>`;
+    });
+    const nz = vals.filter(v => v > 0);
+    if (nz.length > 1) {
+      const avg = nz.reduce((a, v) => a + v, 0) / nz.length, y = base - avg / max * (base - top);
+      g += `<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="var(--orange)" stroke-width="1.3" stroke-dasharray="5 4"/>`
+        + `<text x="2" y="${Math.max(11, y - 5)}" style="fill:var(--orange);font-weight:700">${esc(t('avgShort'))} ${fmtV(avg)}</text>`;
+    }
+    $('#t-chart').innerHTML = g;
+  }
+
+  // ---------- Excel export ----------
+  $('#t-export').onclick = async () => {
+    const m = M(), btn = $('#t-export'); if (!m || btn.disabled) return;
+    const { from, to } = period();
+    const label = btn.innerHTML;
+    btn.disabled = true; btn.innerHTML = `<span class="spin" style="width:18px;height:18px;border-width:2px"></span>${esc(t('exporting'))}`;
+    try {
+      if (dirty) { clearTimeout(syncT); await sync(); }
+      if (dirty) throw new Error('offline');
+      const body = { machineId: m.id, from, to, tz: new Date().getTimezoneOffset() };
+      if (inTg) {
+        await api('POST', '/api/export', body);
+        haptic('success');
+        confirmModal({ title: t('exportSentT'), text: esc(t('exportSent')), icon: 'i-sheet', tone: 'blue',
+          ok: t('openChat'), cancel: t('close'), onOk: () => tg.close() });
+      } else {
+        const r = await fetch('/api/export', { method: 'POST', headers: { 'content-type': 'application/json', 'x-init-data': initData }, body: JSON.stringify({ ...body, deliver: 'download' }) });
+        if (!r.ok) throw new Error('http ' + r.status);
+        const name = (/filename="([^"]+)"/.exec(r.headers.get('content-disposition') || '') || [])[1] || 'WorkFuel.xlsx';
+        const a = document.createElement('a'); a.href = URL.createObjectURL(await r.blob()); a.download = name; a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      }
+    } catch (e) {
+      haptic('error'); toast(t('exportErr'));
+    } finally {
+      btn.disabled = false; btn.innerHTML = label;
+    }
+  };
   $('#t-fill').onclick = () => {
     const m = M();
     askNumber({ title: t('howMuchFill'), value: '', unit: t('liters'),
